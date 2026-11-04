@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Descripción de Usuario')"></head>
+
+<body class="bg-light">
+
+<div th:replace="fragments :: menu"></div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+
+            <!-- Botón Volver arriba -->
+            <div class="mb-3">
+                <a th:href="@{/registrados}" class="btn btn-outline-secondary btn-sm shadow-sm">
+                    &larr; Volver al listado
+                </a>
+            </div>
+
+            <!-- Tarjeta Principal de Perfil -->
+            <div class="card shadow-sm border-0 rounded-lg overflow-hidden">
+
+                <!-- Cabecera de la Tarjeta -->
+                <div class="card-header bg-dark text-white py-3 px-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-0 font-weight-bold" th:text="${usuarioDetalle.nombre != null ? usuarioDetalle.nombre : 'Usuario Registrado'}">Nombre de Usuario</h4>
+                        <small class="text-white-50" th:text="${'ID de cuenta: #' + usuarioDetalle.id}">ID: #1</small>
+                    </div>
+                </div>
+
+                <!-- Cuerpo de la Tarjeta con Datos -->
+                <div class="card-body p-4">
+                    <div class="row">
+
+                        <!-- Columna de Avatar / Inicial -->
+                        <div class="col-md-3 text-center mb-4 mb-md-0 d-flex flex-column align-items-center justify-content-center border-right-md">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold shadow-sm"
+                                 style="width: 90px; height: 90px; font-size: 2.2rem;">
+                                <span th:text="${#strings.substring(usuarioDetalle.nombre != null && !usuarioDetalle.nombre.isEmpty() ? usuarioDetalle.nombre : usuarioDetalle.email, 0, 1).toUpperCase()}">U</span>
+                            </div>
+                            <small class="text-muted mt-2 font-italic">Perfil Público</small>
+                        </div>
+
+                        <!-- Columna con la Lista de Atributos -->
+                        <div class="col-md-9 pl-md-4">
+                            <h5 class="text-dark font-weight-bold mb-3 border-bottom pb-2">Información de la Cuenta</h5>
+
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4 text-muted font-weight-normal">Identificador (ID):</dt>
+                                <dd class="col-sm-8 font-weight-bold" th:text="${usuarioDetalle.id}">1</dd>
+
+                                <dt class="col-sm-4 text-muted font-weight-normal">Correo electrónico:</dt>
+                                <dd class="col-sm-8 font-weight-bold">
+                                    <span th:text="${usuarioDetalle.email}">usuario@example.com</span>
+                                </dd>
+
+                                <dt class="col-sm-4 text-muted font-weight-normal">Nombre completo:</dt>
+                                <dd class="col-sm-8 font-weight-bold">
+                                    <span th:if="${usuarioDetalle.nombre != null}" th:text="${usuarioDetalle.nombre}">Juan Pérez</span>
+                                    <span th:if="${usuarioDetalle.nombre == null}" class="text-muted font-italic">No especificado</span>
+                                </dd>
+
+                                <dt class="col-sm-4 text-muted font-weight-normal">Fecha nacimiento:</dt>
+                                <dd class="col-sm-8 font-weight-bold mb-0">
+                                    <span th:if="${usuarioDetalle.fechaNacimiento != null}"
+                                          th:text="${#dates.format(usuarioDetalle.fechaNacimiento, 'dd/MM/yyyy')}">15/05/1990</span>
+                                    <span th:if="${usuarioDetalle.fechaNacimiento == null}" class="text-muted font-italic">No especificada</span>
+                                </dd>
+                            </dl>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Pie de página con información de seguridad -->
+                <div class="card-footer bg-light px-4 py-3 d-flex align-items-center justify-content-between">
+                    <small class="text-muted">
+                        <span class="text-success font-weight-bold">&bull;</span> Datos protegidos (contraseña oculta)
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments :: javascript"/>
+
+</body>
+</html>

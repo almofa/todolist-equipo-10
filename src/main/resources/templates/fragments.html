@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head (titulo)">
+    <meta charset="UTF-8"/>
+    <title th:text="${titulo}"></title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <!-- Añadir esta línea dentro de <head> en fragments.html si no está -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<nav th:fragment="menu" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <!-- Marca: ToDoList -> Enlace a Acerca de (/about) -->
+        <a class="navbar-brand" th:href="@{/about}">ToDoList</a>
+
+        <!-- Botón Hamburguesa con data-toggle (Bootstrap 4) -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <!-- OPCIONES USUARIO AUTENTICADO -->
+            <ul class="navbar-nav mr-auto" th:if="${usuario != null}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/usuarios/{id}/tareas(id=${usuario.id})}">Tareas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/equipos}">Equipos</a>
+                </li>
+
+                <!-- Opción visible SOLO para Administradores -->
+                <li class="nav-item" th:if="${usuario.admin}">
+                    <a class="nav-link text-warning" th:href="@{/registrados}">Usuarios Registrados</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto" th:if="${usuario != null}">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span th:text="${usuario.nombre != null ? usuario.nombre : usuario.email}">Nombre usuario</span>
+                        <span class="badge badge-warning ml-1" th:if="${usuario.admin}">Admin</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" th:href="@{/cuenta}">Cuenta</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" th:href="@{/logout}">
+                            Cerrar sesión <span th:text="${usuario.nombre != null ? usuario.nombre : usuario.email}"></span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- OPCIONES USUARIO NO AUTENTICADO -->
+            <ul class="navbar-nav ml-auto" th:if="${usuario == null}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/login}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/registro}">Registro</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<div th:fragment="javascript">
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/popper.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</div>
+
+</html>

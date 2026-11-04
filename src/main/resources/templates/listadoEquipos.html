@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head('Listado de Equipos')"></head>
+<body class="bg-light">
+
+<nav th:replace="fragments :: menu"></nav>
+
+<div class="container py-4">
+    <!-- Encabezado de página -->
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="font-weight-bold text-dark mb-1">
+                <i class="bi bi-people-fill text-primary mr-2"></i>Equipos de Trabajo
+            </h2>
+            <p class="text-secondary mb-0">Consulta los equipos registrados, crea nuevos y gestiona tu participación.</p>
+        </div>
+    </div>
+
+    <!-- Alertas de éxito / error (Bootstrap 4: dismiss="alert") -->
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill mr-2"></i><span th:text="${mensaje}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill mr-2"></i><span th:text="${error}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <!-- Formulario para crear un equipo -->
+    <div class="card border-0 shadow-sm mb-4 bg-white rounded">
+        <div class="card-body p-4">
+            <h5 class="font-weight-bold text-dark mb-3"><i class="bi bi-plus-circle-fill mr-2 text-primary"></i>Crear un nuevo equipo</h5>
+            <form th:action="@{/equipos/nuevo}" method="post" class="form-row align-items-center">
+                <div class="col-md-9 mb-2 mb-md-0">
+                    <input type="text" name="nombre" class="form-control form-control-lg" placeholder="Nombre del nuevo equipo..." required />
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block font-weight-bold">
+                        <i class="bi bi-plus-lg mr-1"></i>Crear equipo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Buscador de equipos -->
+    <div class="mb-4" th:if="${!equipos.empty}">
+        <div class="input-group input-group-lg shadow-sm">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-white border-right-0 text-secondary"><i class="bi bi-search"></i></span>
+            </div>
+            <input type="text" id="buscarEquipo" class="form-control border-left-0 pl-0" placeholder="Buscar equipo por nombre...">
+        </div>
+    </div>
+
+    <!-- Listado de tarjetas profesionales de equipos (Bootstrap 4) -->
+    <div class="row" th:if="${!equipos.empty}">
+        <div class="col-md-6 col-lg-4 mb-4 equipo-item" th:each="equipo : ${equipos}">
+            <div class="card h-100 border-0 shadow-sm bg-white">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Cabecera de la tarjeta (ID y Estado) -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge badge-light text-secondary border px-2 py-1 font-weight-bold">
+                                ID: #<span th:text="${equipo.id}">1</span>
+                            </span>
+                            <span class="badge badge-success px-2 py-1 font-weight-bold">
+                                Activo
+                            </span>
+                        </div>
+
+                        <!-- Nombre del Equipo e Icono -->
+                        <div class="media align-items-center mb-3">
+                            <div class="bg-light text-primary rounded-circle p-3 mr-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="bi bi-diagram-3-fill h4 mb-0"></i>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="card-title font-weight-bold text-dark mb-0 equipo-nombre" th:text="${equipo.nombre}">Nombre del Equipo</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="pt-3 border-top mt-3">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap">
+                            <!-- Ver miembros -->
+                            <a th:href="@{/equipos/{id}(id=${equipo.id})}" class="btn btn-outline-primary btn-sm font-weight-bold mb-1">
+                                <i class="bi bi-eye-fill mr-1"></i>Miembros
+                            </a>
+
+                            <div class="d-flex align-items-center mb-1">
+                                <!-- Botón Unirme -->
+                                <form th:action="@{/equipos/{id}/apply(id=${equipo.id})}" method="post" class="d-inline mr-1">
+                                    <button type="submit" class="btn btn-success btn-sm font-weight-bold" title="Unirse a este equipo">
+                                        <i class="bi bi-person-plus-fill mr-1"></i>Unirme
+                                    </button>
+                                </form>
+
+                                <!-- Botón Salir -->
+                                <form th:action="@{/equipos/{id}/exit(id=${equipo.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm font-weight-bold" title="Salir de este equipo">
+                                        <i class="bi bi-box-arrow-right mr-1"></i>Salir
+                                    </button>
+                                </form>
+
+                                <!-- Acciones exclusivas de Administrador -->
+                                <div th:if="${usuario != null && usuario.admin}" class="d-inline-flex border-left pl-2 ml-2">
+                                    <a th:href="@{/equipos/{id}/editar(id=${equipo.id})}"
+                                       class="btn btn-warning btn-sm text-dark font-weight-bold mr-1"
+                                       title="Editar nombre del equipo">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form th:action="@{/equipos/{id}/borrar(id=${equipo.id})}"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Estás seguro de que deseas eliminar este equipo?');">
+                                        <button type="submit" class="btn btn-danger btn-sm font-weight-bold" title="Eliminar equipo">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje cuando no hay equipos -->
+    <div class="card border-0 text-center py-5 rounded bg-white shadow-sm" th:if="${equipos.empty}">
+        <div class="card-body">
+            <i class="bi bi-inbox h1 text-muted d-block mb-2"></i>
+            <h5 class="font-weight-bold text-dark">No hay equipos registrados</h5>
+            <p class="text-secondary mb-0">Actualmente no existe ningún equipo en el sistema. ¡Crea el primero arriba!</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('buscarEquipo')?.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.equipo-item').forEach(item => {
+            const nombre = item.querySelector('.equipo-nombre').textContent.toLowerCase();
+            item.style.display = nombre.includes(query) ? '' : 'none';
+        });
+    });
+</script>
+
+<div th:replace="fragments :: javascript"></div>
+</body>
+</html>

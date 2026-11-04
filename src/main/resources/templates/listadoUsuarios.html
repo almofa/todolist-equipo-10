@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Usuarios registrados')"></head>
+
+<body class="bg-light">
+
+<div th:replace="fragments :: menu"></div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Tarjeta Contenedora de la Tabla -->
+            <div class="card shadow-sm border-0 rounded-lg overflow-hidden">
+
+                <!-- Cabecera de la Tarjeta -->
+                <div class="card-header bg-dark text-white py-3 px-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-0 font-weight-bold">Usuarios Registrados</h4>
+                        <small class="text-white-50">Lista global de cuentas activas en el sistema</small>
+                    </div>
+                </div>
+
+                <!-- Cuerpo con la Tabla Estilizada -->
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col" class="py-3 pl-4" style="width: 10%;">ID</th>
+                                <th scope="col" class="py-3">Usuario</th>
+                                <th scope="col" class="py-3">Correo electrónico</th>
+                                <th scope="col" class="py-3">Estado</th>
+                                <th scope="col" class="py-3 text-right pr-4" style="width: 30%;">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="u : ${usuarios}">
+                                <!-- ID con estilo badge -->
+                                <td class="align-middle pl-4">
+                                    <span class="badge badge-light text-dark border px-2 py-1 font-weight-bold" th:text="${'#' + u.id}">#1</span>
+                                </td>
+
+                                <!-- Avatar con la inicial + Nombre -->
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold mr-3 shadow-sm"
+                                             style="width: 38px; height: 38px; min-width: 38px; font-size: 1rem;">
+                                            <span th:text="${#strings.substring(u.nombre != null && !u.nombre.isEmpty() ? u.nombre : u.email, 0, 1).toUpperCase()}">U</span>
+                                        </div>
+                                        <div>
+                                                <span class="font-weight-bold text-dark d-block"
+                                                      th:text="${u.nombre != null && !u.nombre.isEmpty() ? u.nombre : 'Sin nombre'}">Nombre</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Email con enlace -->
+                                <td class="align-middle">
+                                    <span class="font-weight-bold text-dark d-block"
+                                          th:text="${u.email}">Email</span>
+                                </td>
+
+                                <!-- Columna de Estado -->
+                                <td class="align-middle">
+                                    <span th:if="${u.bloqueado}" class="badge badge-danger px-2 py-1">Bloqueado</span>
+                                    <span th:if="${!u.bloqueado}" class="badge badge-success px-2 py-1">Activo</span>
+                                </td>
+
+                                <!-- Botones de Acción -->
+                                <td class="align-middle text-right pr-4">
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        <a th:href="@{/registrados/{id}(id=${u.id})}" class="btn btn-outline-primary btn-sm px-2 mr-2 shadow-sm">
+                                            Ver descripción &rarr;
+                                        </a>
+
+                                        <!-- Botón de bloqueo (solo visible si el usuario listado NO es admin) -->
+                                        <form th:if="${!u.admin}" th:action="@{/registrados/{id}/bloqueo(id=${u.id})}" method="post" class="d-inline">
+                                            <button type="submit"
+                                                    class="btn btn-sm shadow-sm"
+                                                    th:classappend="${u.bloqueado} ? 'btn-outline-success' : 'btn-outline-danger'"
+                                                    th:text="${u.bloqueado} ? 'Desbloquear' : 'Bloquear'">
+                                                Bloquear
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pie de página con información auxiliar -->
+                <div class="card-footer bg-light px-4 py-3 text-muted small d-flex justify-content-between align-items-center">
+                    <span>Haz clic en un usuario o en <strong>Ver descripción</strong> para consultar su perfil completo.</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments :: javascript"/>
+
+</body>
+</html>

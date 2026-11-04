@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Acceso Denegado')"></head>
+
+<body class="bg-light">
+
+<div th:replace="fragments :: menu"></div>
+
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 text-center">
+
+            <!-- Icono y Código de Error -->
+            <div class="mb-4">
+                <div class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center shadow-sm mb-3"
+                     style="width: 100px; height: 100px; font-size: 3rem;">
+                    !
+                </div>
+                <h1 class="display-4 font-weight-bold text-dark">401</h1>
+                <h3 class="text-muted">Acceso Denegado</h3>
+            </div>
+
+            <!-- Mensaje Descriptivo -->
+            <p class="lead text-secondary mb-5">
+                No tienes los permisos necesarios para acceder a esta página o necesitas iniciar sesión.
+            </p>
+
+            <!-- Botones de Acción -->
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-body p-4 bg-white rounded-lg">
+                    <p class="font-weight-bold mb-3">¿Qué deseas hacer?</p>
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-center">
+                        <a th:href="@{/login}" class="btn btn-primary px-4 py-2 m-2 shadow-sm">
+                            Iniciar Sesión
+                        </a>
+                        <a th:href="@{/registro}" class="btn btn-outline-secondary px-4 py-2 m-2 shadow-sm">
+                            Crear una Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a th:href="@{/}" class="text-decoration-none text-muted small">
+                    &larr; Volver al inicio
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments :: javascript"/>
+
+</body>
+</html>

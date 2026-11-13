@@ -87,4 +87,37 @@ public class AccountControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/cuenta"));
     }
+    @Test
+    public void testFormCambiarPassword() throws Exception {
+        when(managerUserSession.usuarioLogeado()).thenReturn(1L);
+
+        mockMvc.perform(get("/cuenta/password"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("cambiarPassword"));
+    }
+
+    @Test
+    public void testGuardarPasswordCorrecta() throws Exception {
+        when(managerUserSession.usuarioLogeado()).thenReturn(1L);
+        when(usuarioService.cambiarPassword(eq(1L), eq("123456"), eq("nueva123"))).thenReturn(true);
+
+        mockMvc.perform(post("/cuenta/password")
+                        .param("passwordActual", "123456")
+                        .param("passwordNueva", "nueva123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/cuenta"));
+    }
+
+    @Test
+    public void testGuardarPasswordIncorrecta() throws Exception {
+        when(managerUserSession.usuarioLogeado()).thenReturn(1L);
+        when(usuarioService.cambiarPassword(eq(1L), eq("mal"), eq("nueva123"))).thenReturn(false);
+
+        mockMvc.perform(post("/cuenta/password")
+                        .param("passwordActual", "mal")
+                        .param("passwordNueva", "nueva123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("cambiarPassword"))
+                .andExpect(model().attributeExists("error"));
+    }
 }

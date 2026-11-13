@@ -104,4 +104,20 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
     }
+
+    @Transactional
+    public UsuarioData modifica(Long id, UsuarioData datosModificados) {
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        if (usuario == null)
+            throw new UsuarioServiceException("El usuario con id " + id + " no existe");
+
+        usuario.setNombre(datosModificados.getNombre());
+        usuario.setFechaNacimiento(datosModificados.getFechaNacimiento());
+        usuario.setDescripcion(datosModificados.getDescripcion());
+
+        usuarioRepository.save(usuario);
+        return modelMapper.map(usuario, UsuarioData.class);
+    }
 }
+
+

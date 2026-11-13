@@ -47,7 +47,12 @@ public class EquipoService {
     public List<EquipoData> findAllOrdenadoPorNombre() {
         List<Equipo> equipos = equipoRepository.findByOrderByNombreAsc();
         return equipos.stream()
-                .map(equipo -> modelMapper.map(equipo, EquipoData.class))
+                .map(equipo -> {
+                    EquipoData equipoData = modelMapper.map(equipo, EquipoData.class);
+                    // Contamos los miembros dentro de la transacción (la relación es LAZY)
+                    equipoData.setNumMiembros(equipo.getUsuarios().size());
+                    return equipoData;
+                })
                 .collect(Collectors.toList());
     }
 

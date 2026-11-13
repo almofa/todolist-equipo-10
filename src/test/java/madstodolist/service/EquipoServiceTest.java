@@ -249,4 +249,31 @@ public class EquipoServiceTest {
         assertThat(equiposUsuario).isEmpty();
     }
 
+    @Test
+    public void listadoEquiposIncluyeNumeroDeMiembros() {
+        // GIVEN
+        // Un equipo con dos usuarios y otro equipo vacío
+        UsuarioData usuario1 = new UsuarioData();
+        usuario1.setEmail("user1@ua");
+        usuario1.setPassword("123");
+        usuario1 = usuarioService.registrar(usuario1);
+        UsuarioData usuario2 = new UsuarioData();
+        usuario2.setEmail("user2@ua");
+        usuario2.setPassword("123");
+        usuario2 = usuarioService.registrar(usuario2);
+
+        EquipoData equipoConMiembros = equipoService.crearEquipo("Proyecto AAA");
+        equipoService.crearEquipo("Proyecto BBB");
+        equipoService.añadirUsuarioAEquipo(equipoConMiembros.getId(), usuario1.getId());
+        equipoService.añadirUsuarioAEquipo(equipoConMiembros.getId(), usuario2.getId());
+
+        // WHEN
+        // Recuperamos el listado de equipos
+        List<EquipoData> equipos = equipoService.findAllOrdenadoPorNombre();
+
+        // THEN
+        // Cada equipo indica cuántos miembros tiene
+        assertThat(equipos.get(0).getNumMiembros()).isEqualTo(2);
+        assertThat(equipos.get(1).getNumMiembros()).isEqualTo(0);
+    }
 }

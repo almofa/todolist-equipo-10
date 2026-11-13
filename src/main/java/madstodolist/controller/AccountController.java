@@ -74,4 +74,35 @@ public class AccountController {
 
         return "redirect:/cuenta";
     }
+
+    // 4. Formulario para cambiar contraseña (GET)
+    @GetMapping("/cuenta/password")
+    public String formCambiarPassword(Model model) {
+        Long idUsuarioLogueado = managerUserSession.usuarioLogeado();
+        if (idUsuarioLogueado == null) {
+            return "redirect:/login";
+        }
+        return "cambiarPassword";
+    }
+
+    // 5. Procesar el cambio de contraseña (POST)
+    @PostMapping("/cuenta/password")
+    public String guardarPassword(String passwordActual,
+                                  String passwordNueva,
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
+        Long idUsuarioLogueado = managerUserSession.usuarioLogeado();
+        if (idUsuarioLogueado == null) {
+            return "redirect:/login";
+        }
+
+        boolean actualizado = usuarioService.cambiarPassword(idUsuarioLogueado, passwordActual, passwordNueva);
+        if (!actualizado) {
+            model.addAttribute("error", "La contraseña actual no es correcta.");
+            return "cambiarPassword";
+        }
+
+        redirectAttributes.addFlashAttribute("mensaje", "Contraseña actualizada correctamente.");
+        return "redirect:/cuenta";
+    }
 }

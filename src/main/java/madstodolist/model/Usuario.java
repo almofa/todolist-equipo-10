@@ -21,6 +21,7 @@ public class Usuario implements Serializable {
     private String email;
     private String nombre;
     private String password;
+    private String descripcion;
     @Column(name = "fecha_nacimiento")
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;
@@ -46,6 +47,14 @@ public class Usuario implements Serializable {
 
     public Set<Equipo> getEquipos() {
         return equipos;
+    }
+
+    public String getdescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     // Getters y setters atributos básicos

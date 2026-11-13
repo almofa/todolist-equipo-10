@@ -81,6 +81,9 @@
                             </div>
                             <div class="media-body">
                                 <h4 class="card-title font-weight-bold text-dark mb-0 equipo-nombre" th:text="${equipo.nombre}">Nombre del Equipo</h4>
+                                <small class="text-muted equipo-miembros">
+                                    <i class="bi bi-people-fill mr-1"></i><span th:text="${equipo.numMiembros} + (${equipo.numMiembros == 1} ? ' miembro' : ' miembros')">0 miembros</span>
+                                </small>
                             </div>
                         </div>
                     </div>

@@ -16,6 +16,7 @@ public class UsuarioData {
     private Date fechaNacimiento;
     private Boolean admin = false;
     private Boolean bloqueado = false;
+    private String descripcion;
 
     // Getters y setters
 
@@ -69,6 +70,14 @@ public class UsuarioData {
 
     public void setBloqueado(Boolean bloqueado) {
         this.bloqueado = bloqueado;
+    }
+
+    public String getdescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     // Sobreescribimos equals y hashCode para que dos usuarios sean iguales

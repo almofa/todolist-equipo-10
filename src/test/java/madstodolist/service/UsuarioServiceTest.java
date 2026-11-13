@@ -212,4 +212,25 @@ public class UsuarioServiceTest {
         assertThat(usuarioService.login("bloqueo@gmail.com", "1234"))
                 .isEqualTo(UsuarioService.LoginStatus.USER_BLOCKED);
     }
+
+    @Test
+    public void testModificarDescripcionUsuario() {
+        // 1. Registramos un usuario de prueba
+        UsuarioData usuarioData = new UsuarioData();
+        usuarioData.setEmail("usuario.test@ua.es");
+        usuarioData.setNombre("Usuario Test");
+        usuarioData.setPassword("123456");
+        UsuarioData usuarioRegistrado = usuarioService.registrar(usuarioData);
+
+        // 2. Modificamos sus datos añadiendo una descripción
+        usuarioRegistrado.setNombre("Nombre Modificado");
+        usuarioRegistrado.setDescripcion("Esta es mi nueva descripción o biografía en el perfil.");
+
+        usuarioService.modifica(usuarioRegistrado.getId(), usuarioRegistrado);
+
+        // 3. Recuperamos el usuario de la base de datos y comprobamos que se ha guardado la descripción
+        UsuarioData usuarioModificado = usuarioService.findById(usuarioRegistrado.getId());
+        assertThat(usuarioModificado.getNombre()).isEqualTo("Nombre Modificado");
+        assertThat(usuarioModificado.getDescripcion()).isEqualTo("Esta es mi nueva descripción o biografía en el perfil.");
+    }
 }

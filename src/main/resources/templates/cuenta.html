@@ -42,7 +42,7 @@
             <hr class="text-muted opacity-25">
             <div class="row mb-3">
                 <div class="col-md-3 fw-bold text-secondary">Fecha de Nacimiento:</div>
-                <div class="col-md-9 text-dark" th:text="${usuario.fechaNacimiento != ? usuario.fechaNacimiento : 'No especificada'}">YYYY-MM-DD</div>
+                <div class="col-md-9 text-dark" th:text="${usuario.fechaNacimiento != null ? usuario.fechaNacimiento : 'No especificada'}">YYYY-MM-DD</div>
             </div>
             <hr class="text-muted opacity-25">
             <div class="row">

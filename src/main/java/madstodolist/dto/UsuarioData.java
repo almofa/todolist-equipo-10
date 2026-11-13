@@ -72,7 +72,7 @@ public class UsuarioData {
         this.bloqueado = bloqueado;
     }
 
-    public String getdescripcion() {
+    public String getDescripcion() {
         return descripcion;
     }
 

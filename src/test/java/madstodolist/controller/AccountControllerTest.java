@@ -9,12 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Date;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -33,7 +30,6 @@ public class AccountControllerTest {
 
     @Test
     public void testVerCuentaConUsuarioLogueado() throws Exception {
-        // Simulamos que hay un usuario logueado con ID 1L
         when(managerUserSession.usuarioLogeado()).thenReturn(1L);
 
         UsuarioData usuario = new UsuarioData();
@@ -44,7 +40,6 @@ public class AccountControllerTest {
 
         when(usuarioService.findById(1L)).thenReturn(usuario);
 
-        // Comprobamos que al acceder a /cuenta se devuelve la vista "cuenta" con el atributo usuario
         mockMvc.perform(get("/cuenta"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("cuenta"))
@@ -53,7 +48,6 @@ public class AccountControllerTest {
 
     @Test
     public void testVerCuentaSinLoguearRedirigeLogin() throws Exception {
-        // Simulamos que NO hay usuario logueado
         when(managerUserSession.usuarioLogeado()).thenReturn(null);
 
         mockMvc.perform(get("/cuenta"))

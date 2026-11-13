@@ -118,6 +118,21 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
         return modelMapper.map(usuario, UsuarioData.class);
     }
+
+    @Transactional
+    public boolean cambiarPassword(Long usuarioId, String passwordActual, String passwordNueva) {
+        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
+        if (usuario == null) return false;
+
+        // Comprobamos que la contraseña actual sea correcta
+        if (!usuario.getPassword().equals(passwordActual)) {
+            return false;
+        }
+
+        usuario.setPassword(passwordNueva);
+        usuarioRepository.save(usuario);
+        return true;
+    }
 }
 
 

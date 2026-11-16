@@ -16,6 +16,7 @@ public class Equipo implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
+    private String descripcion;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -30,12 +31,19 @@ public class Equipo implements Serializable {
     public Equipo(String nombre) {
         this.nombre = nombre;
     }
+    //constructor sobrecargado con descripcio
+    public Equipo(String nombre, String descripcion) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+    }
 
     // Getters y Setters previos
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
     //método helper para obtener los usuarios del equipo
     public Set<Usuario> getUsuarios() {

@@ -15,27 +15,60 @@
 
     <div class="row mt-3">
         <div class="col">
+            <ul class="nav nav-pills mb-3">
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:classappend="${estadoSeleccionado == null or estadoSeleccionado == 'todas'} ? 'active'"
+                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='todas')}">Todas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:classappend="${estadoSeleccionado == 'pendientes'} ? 'active'"
+                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='pendientes')}">Pendientes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:classappend="${estadoSeleccionado == 'completadas'} ? 'active'"
+                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='completadas')}">Completadas</a>
+                </li>
+            </ul>
+
             <table class="table table-striped">
                 <thead>
                 <tr>
                     <th>Id</th>
                     <th>Tarea</th>
+                    <th>Estado</th>
                     <th>Acción</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="tarea: ${tareas}">
                     <td th:text="${tarea.id}"></td>
-                    <td th:text="${tarea.titulo}"></td>
-                    <td><a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}"/>editar</a>
+                    <td>
+                        <span th:text="${tarea.titulo}"
+                              th:style="${tarea.completada} ? 'text-decoration: line-through; color: #6c757d;' : ''"></span>
+                    </td>
+                    <td>
+                        <span th:if="${tarea.completada}" class="badge badge-success">Completada</span>
+                        <span th:unless="${tarea.completada}" class="badge badge-warning">Pendiente</span>
+                    </td>
+                    <td>
+                        <form th:action="@{/tareas/{id}/completar(id=${tarea.id})}" method="post" style="display:inline;">
+                            <input type="hidden" name="estado" th:value="${estadoSeleccionado}" />
+                            <button type="submit"
+                                    th:class="${tarea.completada} ? 'btn btn-secondary btn-xs' : 'btn btn-success btn-xs'"
+                                    th:text="${tarea.completada} ? 'Reabrir' : 'Completar'"></button>
+                        </form>
+                        <a class="btn btn-primary btn-xs" th:href="@{/tareas/{id}/editar(id=${tarea.id})}">editar</a>
                         <button class="btn btn-danger btn-xs" onmouseover="" style="cursor: pointer;"
-                           th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>
+                                th:onclick="'del(\'/tareas/' + ${tarea.id} + '\')'">borrar</button>
                     </td>
                 </tr>
                 </tbody>
             </table>
             <p><a class="btn btn-primary" th:href="@{/usuarios/{id}/tareas/nueva(id=${usuario.id})}"> Nueva tarea</a>
-            <a class="btn btn-link" href="/logout">Salir</a></p>
+                <a class="btn btn-link" href="/logout">Salir</a></p>
         </div>
     </div>
     <div class="row mt-2">

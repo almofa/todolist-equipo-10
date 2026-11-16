@@ -106,11 +106,17 @@ public class EquipoService {
 
     @Transactional
     public EquipoData modificarEquipo(Long idEquipo, String nuevoNombre) {
-        Equipo equipo = equipoRepository.findById(idEquipo).orElse(null);
-        if (equipo == null) {
-            throw new EquipoServiceException("Equipo no encontrado");
-        }
+        Equipo equipo = equipoRepository.findById(idEquipo)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        return modificarEquipo(idEquipo, nuevoNombre, equipo.getDescripcion());
+    }
+
+    @Transactional
+    public EquipoData modificarEquipo(Long idEquipo, String nuevoNombre, String nuevaDescripcion) {
+        Equipo equipo = equipoRepository.findById(idEquipo)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
         equipo.setNombre(nuevoNombre);
+        equipo.setDescripcion(nuevaDescripcion);
         equipoRepository.save(equipo);
         return modelMapper.map(equipo, EquipoData.class);
     }

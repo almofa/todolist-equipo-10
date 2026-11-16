@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -199,5 +200,82 @@ public class TareaWebTest {
 
         this.mockMvc.perform(get(urlListado))
                 .andExpect(content().string(containsString("Limpiar cristales coche")));
+    }
+
+    @Test
+    public void cambiarEstadoCompletadaTareaRedirigeYActualizaEstado() throws Exception {
+        // GIVEN
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        Long tareaId = ids.get("tareaId");
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(usuarioId);
+
+        // WHEN: marcamos la tarea como completada
+        String urlCompletar = "/tareas/" + tareaId + "/completar";
+        String urlRedirect = "/usuarios/" + usuarioId + "/tareas?estado=todas";
+
+        this.mockMvc.perform(post(urlCompletar))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(urlRedirect))
+                .andExpect(flash().attribute("mensaje", "Estado de la tarea actualizado"));
+
+        // THEN: en BD la tarea aparece como completada
+        assertThat(tareaService.findById(tareaId).isCompletada()).isTrue();
+    }
+
+    @Test
+    public void filtrarTareasPorEstadoMuestraSoloLasCorrespondientes() throws Exception {
+        // GIVEN: usuario con "Lavar coche" (completada) y "Renovar DNI" (pendiente)
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        Long tareaLavarCocheId = ids.get("tareaId");
+
+        tareaService.cambiarEstadoCompletada(tareaLavarCocheId);
+        when(managerUserSession.usuarioLogeado()).thenReturn(usuarioId);
+
+        String urlBase = "/usuarios/" + usuarioId + "/tareas";
+
+        // WHEN & THEN: filtro "pendientes"
+        this.mockMvc.perform(get(urlBase).param("estado", "pendientes"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Renovar DNI"),
+                        not(containsString("Lavar coche"))
+                )));
+
+        // WHEN & THEN: filtro "completadas"
+        this.mockMvc.perform(get(urlBase).param("estado", "completadas"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Lavar coche"),
+                        not(containsString("Renovar DNI"))
+                )));
+
+        // WHEN & THEN: filtro "todas"
+        this.mockMvc.perform(get(urlBase).param("estado", "todas"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Lavar coche"),
+                        containsString("Renovar DNI")
+                )));
+    }
+
+    @Test
+    public void usuarioNoPropietarioNoPuedeCambiarEstadoTarea() throws Exception {
+        // GIVEN
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        Long tareaId = ids.get("tareaId");
+
+        // Logeado otro usuario distinto al dueño de la tarea
+        when(managerUserSession.usuarioLogeado()).thenReturn(usuarioId + 99);
+
+        // WHEN & THEN
+        this.mockMvc.perform(post("/tareas/" + tareaId + "/completar"))
+                .andExpect(status().is3xxRedirection());
+
+        // La tarea sigue sin completarse
+        assertThat(tareaService.findById(tareaId).isCompletada()).isFalse();
     }
 }

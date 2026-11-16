@@ -249,4 +249,12 @@ public class EquipoServiceTest {
         assertThat(equiposUsuario).isEmpty();
     }
 
+    @Test
+    public void crearEquipoConDescripcion() {
+        EquipoData equipo = equipoService.crearEquipo("Proyecto Alpha", "Equipo encargado del backend");
+        assertThat(equipo.getId()).isNotNull();
+        EquipoData equipoBD = equipoService.recuperarEquipo(equipo.getId());
+        assertThat(equipoBD.getNombre()).isEqualTo("Proyecto Alpha");
+        assertThat(equipoBD.getDescripcion()).isEqualTo("Equipo encargado del backend");
+    }
 }

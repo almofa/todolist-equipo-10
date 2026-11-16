@@ -83,11 +83,10 @@
                                 <i class="bi bi-diagram-3-fill h4 mb-0"></i>
                             </div>
                             <div class="media-body">
-                                <h4 class="card-title font-weight-bold text-dark mb-0 equipo-nombre" th:text="${equipo.nombre}">Nombre del Equipo</h4>
-                                <small class="text-muted equipo-miembros">
+                                <h4 class="card-title font-weight-bold text-dark mb-1 equipo-nombre" th:text="${equipo.nombre}">Nombre del Equipo</h4>
+                                <small class="text-muted equipo-miembros d-block mb-1">
                                     <i class="bi bi-people-fill mr-1"></i><span th:text="${equipo.numMiembros} + (${equipo.numMiembros == 1} ? ' miembro' : ' miembros')">0 miembros</span>
                                 </small>
-                                <h4 class="card-title font-weight-bold text-dark mb-1 equipo-nombre" th:text="${equipo.nombre}">Nombre del Equipo</h4>
                                 <p class="text-secondary small mb-0" th:if="${equipo.descripcion != null && !equipo.descripcion.isEmpty()}" th:text="${equipo.descripcion}">Descripción del equipo</p>
                             </div>
                         </div>

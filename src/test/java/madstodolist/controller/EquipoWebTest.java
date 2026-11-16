@@ -351,4 +351,25 @@ public class EquipoWebTest {
 
         verify(equipoService).modificarEquipo(10L, "Proyecto Alpha Editado", "Nueva descripción del proyecto");
     }
+
+    @Test
+    public void listadoEquiposMuestraNombreDeEquipoUnaSolaVez() throws Exception {
+        Long idUsuario = 1L;
+        when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
+        when(usuarioService.findById(idUsuario)).thenReturn(new UsuarioData());
+
+        EquipoData equipo = new EquipoData();
+        equipo.setId(1L);
+        equipo.setNombre("Proyecto Alpha");
+        equipo.setNumMiembros(2);
+        when(equipoService.findAllOrdenadoPorNombre()).thenReturn(Arrays.asList(equipo));
+
+        String html = this.mockMvc.perform(get("/equipos"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        // El nombre debe aparecer en un único elemento de la tarjeta
+        int apariciones = html.split(">Proyecto Alpha<", -1).length - 1;
+        org.assertj.core.api.Assertions.assertThat(apariciones).isEqualTo(1);
+    }
 }

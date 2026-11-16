@@ -271,12 +271,13 @@ public class EquipoServiceTest {
         // Recuperamos el listado de equipos
         List<EquipoData> equipos = equipoService.findAllOrdenadoPorNombre();
 
-        // THEN
+       // THEN
         // Cada equipo indica cuántos miembros tiene
         assertThat(equipos.get(0).getNumMiembros()).isEqualTo(2);
         assertThat(equipos.get(1).getNumMiembros()).isEqualTo(0);
     }
-}
+
+    @Test
     public void crearEquipoConDescripcion() {
         EquipoData equipo = equipoService.crearEquipo("Proyecto Alpha", "Equipo encargado del backend");
         assertThat(equipo.getId()).isNotNull();

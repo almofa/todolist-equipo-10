@@ -70,6 +70,12 @@ public class TareaController {
         model.addAttribute("usuario", usuario);
         model.addAttribute("tareas", tareas);
         model.addAttribute("estadoSeleccionado", estado);
+        // Contadores para mostrar en las pestañas de filtrado
+        long numPendientes = tareaService.contarTareasPorEstado(idUsuario, false);
+        long numCompletadas = tareaService.contarTareasPorEstado(idUsuario, true);
+        model.addAttribute("numPendientes", numPendientes);
+        model.addAttribute("numCompletadas", numCompletadas);
+        model.addAttribute("numTodas", numPendientes + numCompletadas);
         return "listaTareas";
     }
 

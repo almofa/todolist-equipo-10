@@ -19,17 +19,20 @@
                 <li class="nav-item">
                     <a class="nav-link"
                        th:classappend="${estadoSeleccionado == null or estadoSeleccionado == 'todas'} ? 'active'"
-                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='todas')}">Todas</a>
+                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='todas')}"
+                       th:text="'Todas (' + ${numTodas} + ')'">Todas</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
                        th:classappend="${estadoSeleccionado == 'pendientes'} ? 'active'"
-                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='pendientes')}">Pendientes</a>
+                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='pendientes')}"
+                       th:text="'Pendientes (' + ${numPendientes} + ')'">Pendientes</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
                        th:classappend="${estadoSeleccionado == 'completadas'} ? 'active'"
-                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='completadas')}">Completadas</a>
+                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='completadas')}"
+                       th:text="'Completadas (' + ${numCompletadas} + ')'">Completadas</a>
                 </li>
             </ul>
 

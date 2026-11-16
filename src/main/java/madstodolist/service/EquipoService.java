@@ -28,10 +28,15 @@ public class EquipoService {
 
     @Transactional
     public EquipoData crearEquipo(String nombre) {
+        return crearEquipo(nombre, null);
+    }
+
+    @Transactional
+    public EquipoData crearEquipo(String nombre, String descripcion) {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new EquipoServiceException("El nombre del equipo no puede estar vacío");
         }
-        Equipo equipo = new Equipo(nombre);
+        Equipo equipo = new Equipo(nombre, descripcion);
         equipoRepository.save(equipo);
         return modelMapper.map(equipo, EquipoData.class);
     }
@@ -106,11 +111,17 @@ public class EquipoService {
 
     @Transactional
     public EquipoData modificarEquipo(Long idEquipo, String nuevoNombre) {
-        Equipo equipo = equipoRepository.findById(idEquipo).orElse(null);
-        if (equipo == null) {
-            throw new EquipoServiceException("Equipo no encontrado");
-        }
+        Equipo equipo = equipoRepository.findById(idEquipo)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        return modificarEquipo(idEquipo, nuevoNombre, equipo.getDescripcion());
+    }
+
+    @Transactional
+    public EquipoData modificarEquipo(Long idEquipo, String nuevoNombre, String nuevaDescripcion) {
+        Equipo equipo = equipoRepository.findById(idEquipo)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
         equipo.setNombre(nuevoNombre);
+        equipo.setDescripcion(nuevaDescripcion);
         equipoRepository.save(equipo);
         return modelMapper.map(equipo, EquipoData.class);
     }

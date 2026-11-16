@@ -296,3 +296,58 @@ public class EquipoWebTest {
                 .andExpect(content().string(containsString("1 miembro<")));
     }
 }
+    public void crearEquipoConDescripcionRedirigeYMuestraMensajeFlash() throws Exception {
+        Long idUsuario = 1L;
+        when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
+
+        this.mockMvc.perform(post("/equipos/nuevo")
+                        .param("nombre", "Proyecto Delta")
+                        .param("descripcion", "Equipo de desarrollo backend"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos"))
+                .andExpect(flash().attribute("mensaje", "Equipo creado correctamente"));
+
+        verify(equipoService).crearEquipo("Proyecto Delta", "Equipo de desarrollo backend");
+    }
+
+    @Test
+    public void listadoYDetalleMuestranDescripcionDelEquipo() throws Exception {
+        Long idUsuario = 1L;
+        when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
+        when(usuarioService.findById(idUsuario)).thenReturn(new UsuarioData());
+
+        EquipoData equipo = new EquipoData();
+        equipo.setId(5L);
+        equipo.setNombre("Proyecto Omega");
+        equipo.setDescripcion("Descripción detallada de Omega");
+
+        when(equipoService.findAllOrdenadoPorNombre()).thenReturn(Arrays.asList(equipo));
+        when(equipoService.recuperarEquipo(5L)).thenReturn(equipo);
+        when(equipoService.usuariosEquipo(5L)).thenReturn(Arrays.asList());
+
+        this.mockMvc.perform(get("/equipos"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Descripción detallada de Omega")));
+
+        this.mockMvc.perform(get("/equipos/5"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Descripción detallada de Omega")));
+    }
+
+    @Test
+    public void adminPuedeEditarEquipoConDescripcionYMuestraMensajeFlash() throws Exception {
+        UsuarioData admin = new UsuarioData();
+        admin.setAdmin(true);
+
+        when(managerUserSession.comprobarAdmin()).thenReturn(admin);
+
+        this.mockMvc.perform(post("/equipos/10/editar")
+                        .param("nombre", "Proyecto Alpha Editado")
+                        .param("descripcion", "Nueva descripción del proyecto"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos"))
+                .andExpect(flash().attribute("mensaje", "Equipo modificado correctamente"));
+
+        verify(equipoService).modificarEquipo(10L, "Proyecto Alpha Editado", "Nueva descripción del proyecto");
+    }
+}

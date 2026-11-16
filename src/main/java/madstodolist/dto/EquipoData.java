@@ -6,6 +6,7 @@ public class EquipoData {
     private Long id;
     private String nombre;
     private int numMiembros;
+    private String descripcion;
 
     public void setId(Long id) {
         this.id = id;
@@ -31,6 +32,13 @@ public class EquipoData {
         this.numMiembros = numMiembros;
     }
 
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

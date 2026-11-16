@@ -36,8 +36,11 @@
         <div class="card-body p-4">
             <h5 class="font-weight-bold text-dark mb-3"><i class="bi bi-plus-circle-fill mr-2 text-primary"></i>Crear un nuevo equipo</h5>
             <form th:action="@{/equipos/nuevo}" method="post" class="form-row align-items-center">
-                <div class="col-md-9 mb-2 mb-md-0">
+                <div class="col-md-4 mb-2 mb-md-0">
                     <input type="text" name="nombre" class="form-control form-control-lg" placeholder="Nombre del nuevo equipo..." required />
+                </div>
+                <div class="col-md-5 mb-2 mb-md-0">
+                    <input type="text" name="descripcion" class="form-control form-control-lg" placeholder="Descripción del equipo (opcional)..." />
                 </div>
                 <div class="col-md-3">
                     <button type="submit" class="btn btn-primary btn-lg btn-block font-weight-bold">
@@ -84,6 +87,8 @@
                                 <small class="text-muted equipo-miembros">
                                     <i class="bi bi-people-fill mr-1"></i><span th:text="${equipo.numMiembros} + (${equipo.numMiembros == 1} ? ' miembro' : ' miembros')">0 miembros</span>
                                 </small>
+                                <h4 class="card-title font-weight-bold text-dark mb-1 equipo-nombre" th:text="${equipo.nombre}">Nombre del Equipo</h4>
+                                <p class="text-secondary small mb-0" th:if="${equipo.descripcion != null && !equipo.descripcion.isEmpty()}" th:text="${equipo.descripcion}">Descripción del equipo</p>
                             </div>
                         </div>
                     </div>

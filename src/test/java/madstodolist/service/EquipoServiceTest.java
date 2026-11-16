@@ -277,3 +277,25 @@ public class EquipoServiceTest {
         assertThat(equipos.get(1).getNumMiembros()).isEqualTo(0);
     }
 }
+    public void crearEquipoConDescripcion() {
+        EquipoData equipo = equipoService.crearEquipo("Proyecto Alpha", "Equipo encargado del backend");
+        assertThat(equipo.getId()).isNotNull();
+        EquipoData equipoBD = equipoService.recuperarEquipo(equipo.getId());
+        assertThat(equipoBD.getNombre()).isEqualTo("Proyecto Alpha");
+        assertThat(equipoBD.getDescripcion()).isEqualTo("Equipo encargado del backend");
+    }
+
+    @Test
+    public void modificarEquipoConDescripcion() {
+        // GIVEN
+        EquipoData equipo = equipoService.crearEquipo("Proyecto Beta", "Descripción inicial");
+
+        // WHEN
+        equipoService.modificarEquipo(equipo.getId(), "Proyecto Beta v2", "Descripción actualizada");
+
+        // THEN
+        EquipoData equipoActualizado = equipoService.recuperarEquipo(equipo.getId());
+        assertThat(equipoActualizado.getNombre()).isEqualTo("Proyecto Beta v2");
+        assertThat(equipoActualizado.getDescripcion()).isEqualTo("Descripción actualizada");
+    }
+}

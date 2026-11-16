@@ -204,4 +204,19 @@ public class TareaServiceTest {
         assertThat(completadas.get(0).getTitulo()).isEqualTo("Lavar coche");
     }
 
+    @Test
+    public void testContarTareasUsuarioPorEstado() {
+        // GIVEN: usuario con 2 tareas, de las que completamos una
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        tareaService.cambiarEstadoCompletada(ids.get("tareaId"));
+
+        // WHEN
+        long pendientes = tareaService.contarTareasPorEstado(usuarioId, false);
+        long completadas = tareaService.contarTareasPorEstado(usuarioId, true);
+
+        // THEN: hay 1 pendiente y 1 completada
+        assertThat(pendientes).isEqualTo(1);
+        assertThat(completadas).isEqualTo(1);
+    }
 }

@@ -278,4 +278,20 @@ public class TareaWebTest {
         // La tarea sigue sin completarse
         assertThat(tareaService.findById(tareaId).isCompletada()).isFalse();
     }
+
+    @Test
+    public void listaTareasMuestraContadorPendientesYCompletadas() throws Exception {
+        // GIVEN: usuario logeado con 2 tareas, de las que completamos una
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        tareaService.cambiarEstadoCompletada(ids.get("tareaId"));
+        when(managerUserSession.usuarioLogeado()).thenReturn(usuarioId);
+
+        // WHEN, THEN: las pestañas muestran el número de tareas de cada estado
+        this.mockMvc.perform(get("/usuarios/" + usuarioId + "/tareas"))
+                .andExpect(content().string(allOf(
+                        containsString("Todas (2)"),
+                        containsString("Pendientes (1)"),
+                        containsString("Completadas (1)"))));
+    }
 }

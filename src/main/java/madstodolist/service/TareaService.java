@@ -133,4 +133,13 @@ public class TareaService {
                 .map(tarea -> modelMapper.map(tarea, TareaData.class))
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public long contarTareasPorEstado(Long idUsuario, boolean completada) {
+        logger.debug("Contando tareas del usuario " + idUsuario + " con completada=" + completada);
+        if (!usuarioRepository.existsById(idUsuario)) {
+            throw new TareaServiceException("Usuario " + idUsuario + " no existe al contar tareas");
+        }
+        return tareaRepository.countByUsuarioIdAndCompletada(idUsuario, completada);
+    }
 }

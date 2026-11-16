@@ -67,7 +67,11 @@ public class EquipoController {
         Long idUsuario = managerUserSession.comprobarUsuarioLogeado();
 
         try {
-            equipoService.crearEquipo(nombre, descripcion);
+            if (descripcion != null) {
+                equipoService.crearEquipo(nombre, descripcion);
+            } else {
+                equipoService.crearEquipo(nombre);
+            }
             flash.addFlashAttribute("mensaje", "Equipo creado correctamente");
         } catch (EquipoServiceException | EquipoControllerException e) {
             flash.addFlashAttribute("error", e.getMessage());
@@ -130,7 +134,11 @@ public class EquipoController {
         managerUserSession.comprobarAdmin();
 
         try {
-            equipoService.modificarEquipo(idEquipo, nuevoNombre, nuevaDescripcion);
+            if (nuevaDescripcion != null) {
+                equipoService.modificarEquipo(idEquipo, nuevoNombre, nuevaDescripcion);
+            } else {
+                equipoService.modificarEquipo(idEquipo, nuevoNombre);
+            }
             flash.addFlashAttribute("mensaje", "Equipo modificado correctamente");
         } catch (EquipoServiceException e) {
             flash.addFlashAttribute("error", e.getMessage());

@@ -59,14 +59,17 @@ public class TareaController {
      }
 
     @GetMapping("/usuarios/{id}/tareas")
-    public String listadoTareas(@PathVariable(value="id") Long idUsuario, Model model, HttpSession session) {
+    public String listadoTareas(@PathVariable(value="id") Long idUsuario,
+                                @RequestParam(value="estado", required=false, defaultValue="todas") String estado,
+                                Model model, HttpSession session) {
 
         comprobarUsuarioLogeado(idUsuario);
 
         UsuarioData usuario = usuarioService.findById(idUsuario);
-        List<TareaData> tareas = tareaService.allTareasUsuario(idUsuario);
+        List<TareaData> tareas = tareaService.allTareasUsuarioPorEstado(idUsuario, estado);
         model.addAttribute("usuario", usuario);
         model.addAttribute("tareas", tareas);
+        model.addAttribute("estadoSeleccionado", estado);
         return "listaTareas";
     }
 
@@ -117,6 +120,23 @@ public class TareaController {
 
         tareaService.borraTarea(idTarea);
         return "";
+    }
+
+    @PostMapping("/tareas/{id}/completar")
+    public String cambiarEstadoTarea(@PathVariable(value="id") Long idTarea,
+                                     @RequestParam(value="estado", required=false, defaultValue="todas") String estado,
+                                     RedirectAttributes flash, HttpSession session) {
+        TareaData tarea = tareaService.findById(idTarea);
+        if (tarea == null) {
+            throw new TareaNotFoundException();
+        }
+
+        Long idUsuario = tarea.getUsuarioId();
+        comprobarUsuarioLogeado(idUsuario);
+
+        tareaService.cambiarEstadoCompletada(idTarea);
+        flash.addFlashAttribute("mensaje", "Estado de la tarea actualizado");
+        return "redirect:/usuarios/" + idUsuario + "/tareas?estado=" + estado;
     }
 }
 

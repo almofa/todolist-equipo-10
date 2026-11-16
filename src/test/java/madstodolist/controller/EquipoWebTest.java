@@ -295,7 +295,8 @@ public class EquipoWebTest {
                 .andExpect(content().string(containsString("3 miembros")))
                 .andExpect(content().string(containsString("1 miembro<")));
     }
-}
+
+    @Test
     public void crearEquipoConDescripcionRedirigeYMuestraMensajeFlash() throws Exception {
         Long idUsuario = 1L;
         when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);

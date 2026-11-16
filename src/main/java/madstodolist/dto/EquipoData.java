@@ -5,6 +5,7 @@ import java.util.Objects;
 public class EquipoData {
     private Long id;
     private String nombre;
+    private String descripcion;
 
     public void setId(Long id) {
         this.id = id;
@@ -22,6 +23,13 @@ public class EquipoData {
         return nombre;
     }
 
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

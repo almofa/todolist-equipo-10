@@ -62,13 +62,14 @@ public class EquipoController {
 
     @PostMapping("/equipos/nuevo")
     public String crearEquipo(@RequestParam("nombre") String nombre,
+                              @RequestParam(value = "descripcion", required = false) String descripcion,
                               RedirectAttributes flash) {
         Long idUsuario = managerUserSession.comprobarUsuarioLogeado();
 
         try {
-            equipoService.crearEquipo(nombre);
+            equipoService.crearEquipo(nombre, descripcion);
             flash.addFlashAttribute("mensaje", "Equipo creado correctamente");
-        } catch (EquipoControllerException e) {
+        } catch (EquipoServiceException | EquipoControllerException e) {
             flash.addFlashAttribute("error", e.getMessage());
         }
 
@@ -124,11 +125,12 @@ public class EquipoController {
     @PostMapping("/equipos/{id}/editar")
     public String editarEquipo(@PathVariable("id") Long idEquipo,
                                @RequestParam("nombre") String nuevoNombre,
+                               @RequestParam(value = "descripcion", required = false) String nuevaDescripcion,
                                RedirectAttributes flash) {
         managerUserSession.comprobarAdmin();
 
         try {
-            equipoService.modificarEquipo(idEquipo, nuevoNombre);
+            equipoService.modificarEquipo(idEquipo, nuevoNombre, nuevaDescripcion);
             flash.addFlashAttribute("mensaje", "Equipo modificado correctamente");
         } catch (EquipoServiceException e) {
             flash.addFlashAttribute("error", e.getMessage());

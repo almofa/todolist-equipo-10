@@ -273,6 +273,30 @@ public class EquipoWebTest {
     }
 
     @Test
+    public void listadoEquiposMuestraNumeroDeMiembros() throws Exception {
+        Long idUsuario = 1L;
+        when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
+        when(usuarioService.findById(idUsuario)).thenReturn(new UsuarioData());
+
+        EquipoData equipo1 = new EquipoData();
+        equipo1.setId(1L);
+        equipo1.setNombre("Proyecto Alpha");
+        equipo1.setNumMiembros(3);
+
+        EquipoData equipo2 = new EquipoData();
+        equipo2.setId(2L);
+        equipo2.setNombre("Proyecto Beta");
+        equipo2.setNumMiembros(1);
+
+        when(equipoService.findAllOrdenadoPorNombre()).thenReturn(Arrays.asList(equipo1, equipo2));
+
+        this.mockMvc.perform(get("/equipos"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("3 miembros")))
+                .andExpect(content().string(containsString("1 miembro<")));
+    }
+
+    @Test
     public void crearEquipoConDescripcionRedirigeYMuestraMensajeFlash() throws Exception {
         Long idUsuario = 1L;
         when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);

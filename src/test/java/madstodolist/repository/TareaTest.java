@@ -245,4 +245,29 @@ public class TareaTest {
         Tarea tareaBD = tareaRepository.findById(tareaId).orElse(null);
         assertThat(tareaBD.getTitulo()).isEqualTo(tarea.getTitulo());
     }
+
+    @Test
+    @Transactional
+    public void tareaNuevaTieneCompletadaFalseYSePuedeModificar() {
+        // GIVEN
+        Usuario usuario = new Usuario("user@ua");
+        usuarioRepository.save(usuario);
+        Tarea tarea = new Tarea(usuario, "Práctica 2 de MADS");
+
+        // WHEN
+        tareaRepository.save(tarea);
+        Tarea tareaBD = tareaRepository.findById(tarea.getId()).orElse(null);
+
+        // THEN
+        assertThat(tareaBD).isNotNull();
+        assertThat(tareaBD.isCompletada()).isFalse();
+
+        // WHEN
+        tareaBD.setCompletada(true);
+        tareaRepository.save(tareaBD);
+
+        // THEN
+        Tarea tareaActualizada = tareaRepository.findById(tarea.getId()).orElse(null);
+        assertThat(tareaActualizada.isCompletada()).isTrue();
+    }
 }

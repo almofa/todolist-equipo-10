@@ -16,6 +16,7 @@ public class Tarea implements Serializable {
     private Long id;
     @NotNull
     private String titulo;
+    private boolean completada = false;
 
     @NotNull
     // Relación muchos-a-uno entre tareas y usuario
@@ -51,6 +52,14 @@ public class Tarea implements Serializable {
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
+    }
+
+    public boolean isCompletada() {
+        return completada;
+    }
+
+    public void setCompletada(boolean completada) {
+        this.completada = completada;
     }
 
     // Getters y setters de la relación muchos-a-uno con Usuario

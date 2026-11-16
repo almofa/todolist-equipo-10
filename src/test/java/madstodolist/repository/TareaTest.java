@@ -245,4 +245,57 @@ public class TareaTest {
         Tarea tareaBD = tareaRepository.findById(tareaId).orElse(null);
         assertThat(tareaBD.getTitulo()).isEqualTo(tarea.getTitulo());
     }
+
+    @Test
+    @Transactional
+    public void tareaNuevaTieneCompletadaFalseYSePuedeModificar() {
+        // GIVEN
+        Usuario usuario = new Usuario("user@ua");
+        usuarioRepository.save(usuario);
+        Tarea tarea = new Tarea(usuario, "Práctica 2 de MADS");
+
+        // WHEN
+        tareaRepository.save(tarea);
+        Tarea tareaBD = tareaRepository.findById(tarea.getId()).orElse(null);
+
+        // THEN
+        assertThat(tareaBD).isNotNull();
+        assertThat(tareaBD.isCompletada()).isFalse();
+
+        // WHEN
+        tareaBD.setCompletada(true);
+        tareaRepository.save(tareaBD);
+
+        // THEN
+        Tarea tareaActualizada = tareaRepository.findById(tarea.getId()).orElse(null);
+        assertThat(tareaActualizada.isCompletada()).isTrue();
+    }
+
+    @Test
+    @Transactional
+    public void buscarTareasPorUsuarioYEstadoCompletada() {
+        // GIVEN
+        Usuario usuario = new Usuario("user@ua");
+        usuarioRepository.save(usuario);
+
+        Tarea tarea1 = new Tarea(usuario, "Tarea pendiente 1");
+        Tarea tarea2 = new Tarea(usuario, "Tarea completada");
+        tarea2.setCompletada(true);
+        Tarea tarea3 = new Tarea(usuario, "Tarea pendiente 2");
+
+        tareaRepository.save(tarea1);
+        tareaRepository.save(tarea2);
+        tareaRepository.save(tarea3);
+
+        // WHEN
+        java.util.List<Tarea> pendientes = tareaRepository.findByUsuarioIdAndCompletadaOrderByIdAsc(usuario.getId(), false);
+        java.util.List<Tarea> completadas = tareaRepository.findByUsuarioIdAndCompletadaOrderByIdAsc(usuario.getId(), true);
+
+        // THEN
+        assertThat(pendientes).hasSize(2);
+        assertThat(pendientes).extracting(Tarea::getTitulo).containsExactly("Tarea pendiente 1", "Tarea pendiente 2");
+
+        assertThat(completadas).hasSize(1);
+        assertThat(completadas.get(0).getTitulo()).isEqualTo("Tarea completada");
+    }
 }

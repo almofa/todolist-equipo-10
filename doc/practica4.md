@@ -52,7 +52,7 @@ ENTRYPOINT ["sh","-c","java -Djava.security.egd=file:/dev/urandom -jar /app.jar 
 
 `application-postgres.properties` lee `POSTGRES_HOST`, `POSTGRES_PORT`, `DB_USER` y `DB_PASSWD`, con valores por defecto para trabajar en local.
 
-URL de la imagen: **PENDIENTE: poner la URL de Docker Hub de la imagen 1.3.0 cuando esté publicada**
+Imagen Docker: `nicoleepeiro/mads-todolist-equipo10:1.3.0` (<https://hub.docker.com/r/nicoleepeiro/mads-todolist-equipo10>)
 
 ## 3. Despliegue en producción
 
@@ -62,7 +62,7 @@ La base de datos y la aplicación se ejecutan en dos contenedores conectados por
 docker network create network-equipo
 docker run -d --network network-equipo --network-alias postgres -v ${PWD}:/mi-host --name db-equipo \
   -e POSTGRES_USER=mads -e POSTGRES_PASSWORD=mads -e POSTGRES_DB=mads postgres:13
-docker run --network network-equipo -p8080:8080 <usuario>/<imagen>:1.3.0 \
+docker run --network network-equipo -p8080:8080 nicoleepeiro/mads-todolist-equipo10:1.3.0 \
   --spring.profiles.active=postgres-prod --POSTGRES_HOST=postgres
 ```
 

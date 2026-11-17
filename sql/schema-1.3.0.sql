@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict MhVRS8Fp7BpvhW1qLHS5xAF3hpU9Bzj2nkjzofc8t7dCyrKNdtjdqfKLG3Fx8If
+\restrict tJIobTNtgbtsZkYraljpWVoRSNUce6ramq2F7wsFOc9wljhgiAHdj7Bjd5qFU6D
 
 -- Dumped from database version 13.23 (Debian 13.23-1.pgdg13+1)
 -- Dumped by pg_dump version 13.23 (Debian 13.23-1.pgdg13+1)
@@ -40,8 +40,8 @@ ALTER TABLE public.equipo_usuario OWNER TO mads;
 
 CREATE TABLE public.equipos (
     id bigint NOT NULL,
-    nombre character varying(255),
-    descripcion character varying(255)
+    descripcion character varying(255),
+    nombre character varying(255)
 );
 
 
@@ -74,6 +74,7 @@ ALTER SEQUENCE public.equipos_id_seq OWNED BY public.equipos.id;
 
 CREATE TABLE public.tareas (
     id bigint NOT NULL,
+    completada boolean NOT NULL,
     titulo character varying(255) NOT NULL,
     usuario_id bigint NOT NULL
 );
@@ -110,11 +111,11 @@ CREATE TABLE public.usuarios (
     id bigint NOT NULL,
     admin boolean,
     bloqueado boolean,
+    descripcion character varying(255),
     email character varying(255) NOT NULL,
     fecha_nacimiento date,
     nombre character varying(255),
-    password character varying(255),
-    descripcion character varying(255)
+    password character varying(255)
 );
 
 
@@ -222,5 +223,5 @@ ALTER TABLE ONLY public.equipo_usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict MhVRS8Fp7BpvhW1qLHS5xAF3hpU9Bzj2nkjzofc8t7dCyrKNdtjdqfKLG3Fx8If
+\unrestrict tJIobTNtgbtsZkYraljpWVoRSNUce6ramq2F7wsFOc9wljhgiAHdj7Bjd5qFU6D
 

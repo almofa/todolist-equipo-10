@@ -1,5 +1,6 @@
 package madstodolist.service;
 
+import madstodolist.dto.EquipoData;
 import madstodolist.dto.ResumenUsuarioData;
 import madstodolist.dto.TareaData;
 import madstodolist.dto.UsuarioData;
@@ -22,6 +23,9 @@ public class ResumenServiceTest {
 
     @Autowired
     ResumenService resumenService;
+
+    @Autowired
+    EquipoService equipoService;
 
     @Test
     public void testResumenTotalesTareas() {
@@ -82,5 +86,24 @@ public class ResumenServiceTest {
         assertThat(resumen.getTareasCompletadas()).isEqualTo(0);
         assertThat(resumen.getTareasPendientes()).isEqualTo(0);
         assertThat(resumen.getPorcentajeCompletado()).isEqualTo(0);
+    }
+
+    @Test
+    public void testResumenEquiposUsuario() {
+        // GIVEN: un usuario que pertenece a un equipo
+        UsuarioData usuario = new UsuarioData();
+        usuario.setEmail("user@ua");
+        usuario.setPassword("123");
+        UsuarioData usuarioNuevo = usuarioService.registrar(usuario);
+
+        EquipoData equipo = equipoService.crearEquipo("Proyecto 1");
+        equipoService.añadirUsuarioAEquipo(equipo.getId(), usuarioNuevo.getId());
+
+        // WHEN
+        ResumenUsuarioData resumen = resumenService.resumenUsuario(usuarioNuevo.getId());
+
+        // THEN: el resumen contiene ese equipo
+        assertThat(resumen.getEquipos()).hasSize(1);
+        assertThat(resumen.getEquipos().get(0).getNombre()).isEqualTo("Proyecto 1");
     }
 }

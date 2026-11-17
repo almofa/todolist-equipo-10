@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict H2LOU8DfHBUI3ZzrRvThRYE4HnkFvQeBRvykabheeUWSbwcIttqgIBUj9tMoqb0
+\restrict W3WKSfPUr1O51ZFri7cREgznCaPANeZjYfNFLAFgFsaS4X4QImSpqcdnzZHbLma
 
 -- Dumped from database version 13.23 (Debian 13.23-1.pgdg13+1)
 -- Dumped by pg_dump version 13.23 (Debian 13.23-1.pgdg13+1)
@@ -18,23 +18,23 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY public.equipo_usuario DROP CONSTRAINT IF EXISTS fksabsvjgvfuen6hmyg7gn7oq4v;
-ALTER TABLE IF EXISTS ONLY public.equipo_usuario DROP CONSTRAINT IF EXISTS fkk4y9gec15ccnirp3r7w29o66p;
-ALTER TABLE IF EXISTS ONLY public.tareas DROP CONSTRAINT IF EXISTS fkdmoaxl7yv4q6vkc9h32wvbddr;
-ALTER TABLE IF EXISTS ONLY public.usuarios DROP CONSTRAINT IF EXISTS usuarios_pkey;
-ALTER TABLE IF EXISTS ONLY public.tareas DROP CONSTRAINT IF EXISTS tareas_pkey;
-ALTER TABLE IF EXISTS ONLY public.equipos DROP CONSTRAINT IF EXISTS equipos_pkey;
-ALTER TABLE IF EXISTS ONLY public.equipo_usuario DROP CONSTRAINT IF EXISTS equipo_usuario_pkey;
-ALTER TABLE IF EXISTS public.usuarios ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.tareas ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.equipos ALTER COLUMN id DROP DEFAULT;
-DROP SEQUENCE IF EXISTS public.usuarios_id_seq;
-DROP TABLE IF EXISTS public.usuarios;
-DROP SEQUENCE IF EXISTS public.tareas_id_seq;
-DROP TABLE IF EXISTS public.tareas;
-DROP SEQUENCE IF EXISTS public.equipos_id_seq;
-DROP TABLE IF EXISTS public.equipos;
-DROP TABLE IF EXISTS public.equipo_usuario;
+ALTER TABLE ONLY public.equipo_usuario DROP CONSTRAINT fksabsvjgvfuen6hmyg7gn7oq4v;
+ALTER TABLE ONLY public.equipo_usuario DROP CONSTRAINT fkk4y9gec15ccnirp3r7w29o66p;
+ALTER TABLE ONLY public.tareas DROP CONSTRAINT fkdmoaxl7yv4q6vkc9h32wvbddr;
+ALTER TABLE ONLY public.usuarios DROP CONSTRAINT usuarios_pkey;
+ALTER TABLE ONLY public.tareas DROP CONSTRAINT tareas_pkey;
+ALTER TABLE ONLY public.equipos DROP CONSTRAINT equipos_pkey;
+ALTER TABLE ONLY public.equipo_usuario DROP CONSTRAINT equipo_usuario_pkey;
+ALTER TABLE public.usuarios ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.tareas ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.equipos ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE public.usuarios_id_seq;
+DROP TABLE public.usuarios;
+DROP SEQUENCE public.tareas_id_seq;
+DROP TABLE public.tareas;
+DROP SEQUENCE public.equipos_id_seq;
+DROP TABLE public.equipos;
+DROP TABLE public.equipo_usuario;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -57,8 +57,8 @@ ALTER TABLE public.equipo_usuario OWNER TO mads;
 
 CREATE TABLE public.equipos (
     id bigint NOT NULL,
-    descripcion character varying(255),
-    nombre character varying(255)
+    nombre character varying(255),
+    descripcion character varying(255)
 );
 
 
@@ -91,9 +91,9 @@ ALTER SEQUENCE public.equipos_id_seq OWNED BY public.equipos.id;
 
 CREATE TABLE public.tareas (
     id bigint NOT NULL,
-    completada boolean NOT NULL,
     titulo character varying(255) NOT NULL,
-    usuario_id bigint NOT NULL
+    usuario_id bigint NOT NULL,
+    completada boolean DEFAULT false NOT NULL
 );
 
 
@@ -128,11 +128,11 @@ CREATE TABLE public.usuarios (
     id bigint NOT NULL,
     admin boolean,
     bloqueado boolean,
-    descripcion character varying(255),
     email character varying(255) NOT NULL,
     fecha_nacimiento date,
     nombre character varying(255),
-    password character varying(255)
+    password character varying(255),
+    descripcion character varying(255)
 );
 
 
@@ -185,7 +185,7 @@ ALTER TABLE ONLY public.usuarios ALTER COLUMN id SET DEFAULT nextval('public.usu
 --
 
 COPY public.equipo_usuario (fk_equipo, fk_usuario) FROM stdin;
-2	1
+1	1
 \.
 
 
@@ -193,9 +193,8 @@ COPY public.equipo_usuario (fk_equipo, fk_usuario) FROM stdin;
 -- Data for Name: equipos; Type: TABLE DATA; Schema: public; Owner: mads
 --
 
-COPY public.equipos (id, descripcion, nombre) FROM stdin;
-1		Gandores
-2	Somos los mejores	Tigres
+COPY public.equipos (id, nombre, descripcion) FROM stdin;
+1	Equipo 10	Equipo de la práctica de MADS
 \.
 
 
@@ -203,11 +202,11 @@ COPY public.equipos (id, descripcion, nombre) FROM stdin;
 -- Data for Name: tareas; Type: TABLE DATA; Schema: public; Owner: mads
 --
 
-COPY public.tareas (id, completada, titulo, usuario_id) FROM stdin;
-2	f	ir al gym	1
-3	f	quedar con pepe	1
-4	t	revisar examen mads	1
-1	t	hacer la compra	1
+COPY public.tareas (id, titulo, usuario_id, completada) FROM stdin;
+2	Ir al gym	1	f
+4	Repasar GitFlow	1	f
+1	Comprar carne	1	t
+3	Preparar entrega práctica 4	1	f
 \.
 
 
@@ -215,8 +214,8 @@ COPY public.tareas (id, completada, titulo, usuario_id) FROM stdin;
 -- Data for Name: usuarios; Type: TABLE DATA; Schema: public; Owner: mads
 --
 
-COPY public.usuarios (id, admin, bloqueado, descripcion, email, fecha_nacimiento, nombre, password) FROM stdin;
-1	f	f	\N	demo@ua.es	2015-07-17	demo	demo
+COPY public.usuarios (id, admin, bloqueado, email, fecha_nacimiento, nombre, password, descripcion) FROM stdin;
+1	f	f	iker@ua.es	2005-06-25	iker roig	iker	\N
 \.
 
 
@@ -224,7 +223,7 @@ COPY public.usuarios (id, admin, bloqueado, descripcion, email, fecha_nacimiento
 -- Name: equipos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: mads
 --
 
-SELECT pg_catalog.setval('public.equipos_id_seq', 2, true);
+SELECT pg_catalog.setval('public.equipos_id_seq', 1, true);
 
 
 --
@@ -301,5 +300,5 @@ ALTER TABLE ONLY public.equipo_usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict H2LOU8DfHBUI3ZzrRvThRYE4HnkFvQeBRvykabheeUWSbwcIttqgIBUj9tMoqb0
+\unrestrict W3WKSfPUr1O51ZFri7cREgznCaPANeZjYfNFLAFgFsaS4X4QImSpqcdnzZHbLma
 

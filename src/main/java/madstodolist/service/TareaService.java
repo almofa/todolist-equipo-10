@@ -97,4 +97,49 @@ public class TareaService {
         }
         return usuario.getTareas().contains(tarea);
     }
+
+    @Transactional
+    public TareaData cambiarEstadoCompletada(Long idTarea) {
+        logger.debug("Cambiando estado completada de tarea " + idTarea);
+        Tarea tarea = tareaRepository.findById(idTarea).orElse(null);
+        if (tarea == null) {
+            throw new TareaServiceException("No existe tarea con id " + idTarea);
+        }
+        tarea.setCompletada(!tarea.isCompletada());
+        tarea = tareaRepository.save(tarea);
+        return modelMapper.map(tarea, TareaData.class);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TareaData> allTareasUsuarioPorEstado(Long idUsuario, String estado) {
+        logger.debug("Devolviendo tareas del usuario " + idUsuario + " con estado " + estado);
+        if (estado == null || estado.isEmpty() || estado.equalsIgnoreCase("todas")) {
+            return allTareasUsuario(idUsuario);
+        }
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            throw new TareaServiceException("Usuario " + idUsuario + " no existe al listar tareas ");
+        }
+        boolean completada;
+        if (estado.equalsIgnoreCase("completadas")) {
+            completada = true;
+        } else if (estado.equalsIgnoreCase("pendientes")) {
+            completada = false;
+        } else {
+            return allTareasUsuario(idUsuario);
+        }
+        return tareaRepository.findByUsuarioIdAndCompletadaOrderByIdAsc(idUsuario, completada)
+                .stream()
+                .map(tarea -> modelMapper.map(tarea, TareaData.class))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public long contarTareasPorEstado(Long idUsuario, boolean completada) {
+        logger.debug("Contando tareas del usuario " + idUsuario + " con completada=" + completada);
+        if (!usuarioRepository.existsById(idUsuario)) {
+            throw new TareaServiceException("Usuario " + idUsuario + " no existe al contar tareas");
+        }
+        return tareaRepository.countByUsuarioIdAndCompletada(idUsuario, completada);
+    }
 }

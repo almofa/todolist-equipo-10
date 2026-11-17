@@ -5,6 +5,7 @@ import java.util.Objects;
 public class EquipoData {
     private Long id;
     private String nombre;
+    private int numMiembros;
     private String descripcion;
 
     public void setId(Long id) {
@@ -21,6 +22,14 @@ public class EquipoData {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public int getNumMiembros() {
+        return numMiembros;
+    }
+
+    public void setNumMiembros(int numMiembros) {
+        this.numMiembros = numMiembros;
     }
 
     public String getDescripcion() {

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head('Resumen')"></head>
+<body class="bg-light">
+
+<nav th:replace="fragments :: menu"></nav>
+
+<div class="container py-4">
+    <div class="mb-4 pb-2 border-bottom">
+        <h2 class="font-weight-bold text-dark mb-1">
+            <i class="bi bi-bar-chart-fill text-primary mr-2"></i>Resumen de tu actividad
+        </h2>
+        <p class="text-secondary mb-0">Estado de tus tareas y de los equipos a los que perteneces.</p>
+    </div>
+
+    <!-- Tareas -->
+    <div class="card border-0 shadow-sm mb-4 bg-white rounded">
+        <div class="card-body p-4">
+            <h5 class="font-weight-bold text-dark mb-3"><i class="bi bi-check2-square mr-2 text-primary"></i>Tareas</h5>
+            <p class="mb-3">
+                <span class="mr-3">Total: <strong th:text="${resumen.totalTareas}">0</strong></span>
+                <span class="mr-3">Completadas: <strong th:text="${resumen.tareasCompletadas}">0</strong></span>
+                <span>Pendientes: <strong th:text="${resumen.tareasPendientes}">0</strong></span>
+            </p>
+            <div class="progress" style="height: 24px;" th:if="${resumen.totalTareas > 0}">
+                <div class="progress-bar bg-success" role="progressbar"
+                     th:style="'width: ' + ${resumen.porcentajeCompletado} + '%'"
+                     th:text="${resumen.porcentajeCompletado} + '%'">0%</div>
+            </div>
+            <p class="text-secondary mb-0" th:unless="${resumen.totalTareas > 0}">Todavía no tienes tareas.</p>
+        </div>
+    </div>
+
+    <!-- Equipos -->
+    <div class="card border-0 shadow-sm bg-white rounded">
+        <div class="card-body p-4">
+            <h5 class="font-weight-bold text-dark mb-3"><i class="bi bi-people-fill mr-2 text-primary"></i>Mis equipos</h5>
+            <ul class="list-group list-group-flush" th:if="${!resumen.equipos.empty}">
+                <li class="list-group-item" th:each="equipo : ${resumen.equipos}">
+                    <a th:href="@{/equipos/{id}(id=${equipo.id})}" th:text="${equipo.nombre}">Nombre del equipo</a>
+                </li>
+            </ul>
+            <p class="text-secondary mb-0" th:if="${resumen.equipos.empty}">No perteneces a ningún equipo.</p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments :: javascript"></div>
+</body>
+</html>

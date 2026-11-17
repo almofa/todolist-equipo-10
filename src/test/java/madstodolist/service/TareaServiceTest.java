@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 // Hemos eliminado todos los @Transactional de los tests
 // y usado un script para limpiar la BD de test después de
@@ -147,4 +148,75 @@ public class TareaServiceTest {
         assertThat(tareaService.usuarioContieneTarea(usuarioId,tareaId)).isTrue();
     }
 
+    @Test
+    public void testCambiarEstadoCompletadaTarea() {
+        // GIVEN
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long tareaId = ids.get("tareaId");
+
+        // Estado inicial debe ser false
+        TareaData tareaInicial = tareaService.findById(tareaId);
+        assertThat(tareaInicial.isCompletada()).isFalse();
+
+        // WHEN: marcamos como completada
+        TareaData tareaCompletada = tareaService.cambiarEstadoCompletada(tareaId);
+
+        // THEN
+        assertThat(tareaCompletada.isCompletada()).isTrue();
+        assertThat(tareaService.findById(tareaId).isCompletada()).isTrue();
+
+        // WHEN: volvemos a cambiar estado (desmarcar)
+        TareaData tareaPendiente = tareaService.cambiarEstadoCompletada(tareaId);
+
+        // THEN
+        assertThat(tareaPendiente.isCompletada()).isFalse();
+        assertThat(tareaService.findById(tareaId).isCompletada()).isFalse();
+    }
+
+    @Test
+    public void testCambiarEstadoTareaInexistenteLanzaExcepcion() {
+        assertThatThrownBy(() -> tareaService.cambiarEstadoCompletada(999L))
+                .isInstanceOf(TareaServiceException.class);
+    }
+
+    @Test
+    public void testFiltrarTareasUsuarioPorEstado() {
+        // GIVEN: usuario con 2 tareas ("Lavar coche" y "Renovar DNI")
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        Long tarea1Id = ids.get("tareaId");
+
+        // Completamos la primera tarea ("Lavar coche")
+        tareaService.cambiarEstadoCompletada(tarea1Id);
+
+        // WHEN
+        List<TareaData> todas = tareaService.allTareasUsuarioPorEstado(usuarioId, "todas");
+        List<TareaData> pendientes = tareaService.allTareasUsuarioPorEstado(usuarioId, "pendientes");
+        List<TareaData> completadas = tareaService.allTareasUsuarioPorEstado(usuarioId, "completadas");
+
+        // THEN
+        assertThat(todas).hasSize(2);
+
+        assertThat(pendientes).hasSize(1);
+        assertThat(pendientes.get(0).getTitulo()).isEqualTo("Renovar DNI");
+
+        assertThat(completadas).hasSize(1);
+        assertThat(completadas.get(0).getTitulo()).isEqualTo("Lavar coche");
+    }
+
+    @Test
+    public void testContarTareasUsuarioPorEstado() {
+        // GIVEN: usuario con 2 tareas, de las que completamos una
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        tareaService.cambiarEstadoCompletada(ids.get("tareaId"));
+
+        // WHEN
+        long pendientes = tareaService.contarTareasPorEstado(usuarioId, false);
+        long completadas = tareaService.contarTareasPorEstado(usuarioId, true);
+
+        // THEN: hay 1 pendiente y 1 completada
+        assertThat(pendientes).isEqualTo(1);
+        assertThat(completadas).isEqualTo(1);
+    }
 }

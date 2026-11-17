@@ -273,6 +273,30 @@ public class EquipoWebTest {
     }
 
     @Test
+    public void listadoEquiposMuestraNumeroDeMiembros() throws Exception {
+        Long idUsuario = 1L;
+        when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
+        when(usuarioService.findById(idUsuario)).thenReturn(new UsuarioData());
+
+        EquipoData equipo1 = new EquipoData();
+        equipo1.setId(1L);
+        equipo1.setNombre("Proyecto Alpha");
+        equipo1.setNumMiembros(3);
+
+        EquipoData equipo2 = new EquipoData();
+        equipo2.setId(2L);
+        equipo2.setNombre("Proyecto Beta");
+        equipo2.setNumMiembros(1);
+
+        when(equipoService.findAllOrdenadoPorNombre()).thenReturn(Arrays.asList(equipo1, equipo2));
+
+        this.mockMvc.perform(get("/equipos"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("3 miembros")))
+                .andExpect(content().string(containsString("1 miembro<")));
+    }
+
+    @Test
     public void crearEquipoConDescripcionRedirigeYMuestraMensajeFlash() throws Exception {
         Long idUsuario = 1L;
         when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
@@ -326,5 +350,26 @@ public class EquipoWebTest {
                 .andExpect(flash().attribute("mensaje", "Equipo modificado correctamente"));
 
         verify(equipoService).modificarEquipo(10L, "Proyecto Alpha Editado", "Nueva descripción del proyecto");
+    }
+
+    @Test
+    public void listadoEquiposMuestraNombreDeEquipoUnaSolaVez() throws Exception {
+        Long idUsuario = 1L;
+        when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
+        when(usuarioService.findById(idUsuario)).thenReturn(new UsuarioData());
+
+        EquipoData equipo = new EquipoData();
+        equipo.setId(1L);
+        equipo.setNombre("Proyecto Alpha");
+        equipo.setNumMiembros(2);
+        when(equipoService.findAllOrdenadoPorNombre()).thenReturn(Arrays.asList(equipo));
+
+        String html = this.mockMvc.perform(get("/equipos"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        // El nombre debe aparecer en un único elemento de la tarjeta
+        int apariciones = html.split(">Proyecto Alpha<", -1).length - 1;
+        org.assertj.core.api.Assertions.assertThat(apariciones).isEqualTo(1);
     }
 }

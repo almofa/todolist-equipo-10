@@ -44,4 +44,25 @@ public class ResumenServiceTest {
         assertThat(resumen.getTareasCompletadas()).isEqualTo(1);
         assertThat(resumen.getTareasPendientes()).isEqualTo(2);
     }
+
+    @Test
+    public void testResumenPorcentajeCompletado() {
+        // GIVEN: un usuario con 3 tareas, dos de ellas completadas
+        UsuarioData usuario = new UsuarioData();
+        usuario.setEmail("user@ua");
+        usuario.setPassword("123");
+        UsuarioData usuarioNuevo = usuarioService.registrar(usuario);
+
+        TareaData tarea1 = tareaService.nuevaTareaUsuario(usuarioNuevo.getId(), "Lavar coche");
+        TareaData tarea2 = tareaService.nuevaTareaUsuario(usuarioNuevo.getId(), "Renovar DNI");
+        tareaService.nuevaTareaUsuario(usuarioNuevo.getId(), "Estudiar MADS");
+        tareaService.cambiarEstadoCompletada(tarea1.getId());
+        tareaService.cambiarEstadoCompletada(tarea2.getId());
+
+        // WHEN
+        ResumenUsuarioData resumen = resumenService.resumenUsuario(usuarioNuevo.getId());
+
+        // THEN: 2 de 3 = 66,67 %, redondeado a 67
+        assertThat(resumen.getPorcentajeCompletado()).isEqualTo(67);
+    }
 }

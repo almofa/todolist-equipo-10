@@ -16,7 +16,7 @@ public class ResumenService {
         int completadas = tareaService.allTareasUsuarioPorEstado(idUsuario, "completadas").size();
         int pendientes = tareaService.allTareasUsuarioPorEstado(idUsuario, "pendientes").size();
         int total = completadas + pendientes;
-        int porcentaje = (int) Math.round(completadas * 100.0 / total);
+        int porcentaje = total == 0 ? 0 : (int) Math.round(completadas * 100.0 / total);
         return new ResumenUsuarioData(total, completadas, pendientes, porcentaje);
     }
 }

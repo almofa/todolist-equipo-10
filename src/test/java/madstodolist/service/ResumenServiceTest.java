@@ -65,4 +65,22 @@ public class ResumenServiceTest {
         // THEN: 2 de 3 = 66,67 %, redondeado a 67
         assertThat(resumen.getPorcentajeCompletado()).isEqualTo(67);
     }
+
+    @Test
+    public void testResumenSinTareas() {
+        // GIVEN: un usuario sin tareas
+        UsuarioData usuario = new UsuarioData();
+        usuario.setEmail("user@ua");
+        usuario.setPassword("123");
+        UsuarioData usuarioNuevo = usuarioService.registrar(usuario);
+
+        // WHEN
+        ResumenUsuarioData resumen = resumenService.resumenUsuario(usuarioNuevo.getId());
+
+        // THEN: sin tareas, el porcentaje es 0 (y no hay error de división)
+        assertThat(resumen.getTotalTareas()).isEqualTo(0);
+        assertThat(resumen.getTareasCompletadas()).isEqualTo(0);
+        assertThat(resumen.getTareasPendientes()).isEqualTo(0);
+        assertThat(resumen.getPorcentajeCompletado()).isEqualTo(0);
+    }
 }

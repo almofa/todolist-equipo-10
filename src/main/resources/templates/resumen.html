@@ -22,11 +22,12 @@
                 <span class="mr-3">Completadas: <strong th:text="${resumen.tareasCompletadas}">0</strong></span>
                 <span>Pendientes: <strong th:text="${resumen.tareasPendientes}">0</strong></span>
             </p>
-            <div class="progress" style="height: 24px;">
+            <div class="progress" style="height: 24px;" th:if="${resumen.totalTareas > 0}">
                 <div class="progress-bar bg-success" role="progressbar"
                      th:style="'width: ' + ${resumen.porcentajeCompletado} + '%'"
                      th:text="${resumen.porcentajeCompletado} + '%'">0%</div>
             </div>
+            <p class="text-secondary mb-0" th:unless="${resumen.totalTareas > 0}">Todavía no tienes tareas.</p>
         </div>
     </div>
 

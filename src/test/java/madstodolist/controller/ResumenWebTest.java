@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.hamcrest.Matchers.not;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -73,6 +74,26 @@ public class ResumenWebTest {
                 .andExpect(view().name("resumen"))
                 .andExpect(model().attributeExists("resumen"))
                 .andExpect(content().string(containsString("33%")))
-                .andExpect(content().string(containsString("Proyecto Alpha")));
+                .andExpect(content().string(containsString("Proyecto Alpha")))
+                .andExpect(content().string(not(containsString("Todavía no tienes tareas"))));
+    }
+
+    @Test
+    public void resumenSinTareasMuestraMensajeEnLugarDeLaBarra() throws Exception {
+        Long idUsuario = 1L;
+        UsuarioData usuario = new UsuarioData();
+        usuario.setId(idUsuario);
+        usuario.setNombre("Juan");
+
+        when(managerUserSession.comprobarUsuarioLogeado()).thenReturn(idUsuario);
+        when(managerUserSession.usuarioLogeado()).thenReturn(idUsuario);
+        when(usuarioService.findById(idUsuario)).thenReturn(usuario);
+        when(resumenService.resumenUsuario(idUsuario))
+                .thenReturn(new ResumenUsuarioData(0, 0, 0, 0, Collections.emptyList()));
+
+        this.mockMvc.perform(get("/resumen"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Todavía no tienes tareas")))
+                .andExpect(content().string(not(containsString("progress-bar"))));
     }
 }

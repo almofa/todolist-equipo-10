@@ -22,18 +22,23 @@ public class ResumenServiceTest {
     TareaService tareaService;
 
     @Autowired
-    ResumenService resumenService;
+    EquipoService equipoService;
 
     @Autowired
-    EquipoService equipoService;
+    ResumenService resumenService;
+
+    // Registra en la BD el usuario de prueba y lo devuelve
+    private UsuarioData registrarUsuario() {
+        UsuarioData usuario = new UsuarioData();
+        usuario.setEmail("user@ua");
+        usuario.setPassword("123");
+        return usuarioService.registrar(usuario);
+    }
 
     @Test
     public void testResumenTotalesTareas() {
         // GIVEN: un usuario con 3 tareas, una de ellas completada
-        UsuarioData usuario = new UsuarioData();
-        usuario.setEmail("user@ua");
-        usuario.setPassword("123");
-        UsuarioData usuarioNuevo = usuarioService.registrar(usuario);
+        UsuarioData usuarioNuevo = registrarUsuario();
 
         TareaData tarea1 = tareaService.nuevaTareaUsuario(usuarioNuevo.getId(), "Lavar coche");
         tareaService.nuevaTareaUsuario(usuarioNuevo.getId(), "Renovar DNI");
@@ -52,10 +57,7 @@ public class ResumenServiceTest {
     @Test
     public void testResumenPorcentajeCompletado() {
         // GIVEN: un usuario con 3 tareas, dos de ellas completadas
-        UsuarioData usuario = new UsuarioData();
-        usuario.setEmail("user@ua");
-        usuario.setPassword("123");
-        UsuarioData usuarioNuevo = usuarioService.registrar(usuario);
+        UsuarioData usuarioNuevo = registrarUsuario();
 
         TareaData tarea1 = tareaService.nuevaTareaUsuario(usuarioNuevo.getId(), "Lavar coche");
         TareaData tarea2 = tareaService.nuevaTareaUsuario(usuarioNuevo.getId(), "Renovar DNI");
@@ -73,10 +75,7 @@ public class ResumenServiceTest {
     @Test
     public void testResumenSinTareas() {
         // GIVEN: un usuario sin tareas
-        UsuarioData usuario = new UsuarioData();
-        usuario.setEmail("user@ua");
-        usuario.setPassword("123");
-        UsuarioData usuarioNuevo = usuarioService.registrar(usuario);
+        UsuarioData usuarioNuevo = registrarUsuario();
 
         // WHEN
         ResumenUsuarioData resumen = resumenService.resumenUsuario(usuarioNuevo.getId());
@@ -91,10 +90,7 @@ public class ResumenServiceTest {
     @Test
     public void testResumenEquiposUsuario() {
         // GIVEN: un usuario que pertenece a un equipo
-        UsuarioData usuario = new UsuarioData();
-        usuario.setEmail("user@ua");
-        usuario.setPassword("123");
-        UsuarioData usuarioNuevo = usuarioService.registrar(usuario);
+        UsuarioData usuarioNuevo = registrarUsuario();
 
         EquipoData equipo = equipoService.crearEquipo("Proyecto 1");
         equipoService.añadirUsuarioAEquipo(equipo.getId(), usuarioNuevo.getId());

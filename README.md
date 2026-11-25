@@ -33,3 +33,9 @@ Una vez lanzada la aplicación puedes abrir un navegador y probar la página de 
 ```
 https://hub.docker.com/r/amf162/mads-todolist
 ```
+
+## Tablero Trello
+
+```
+https://trello.com/b/eRWzFoCy/todolist-equipo-10
+```

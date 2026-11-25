@@ -31,7 +31,7 @@ Una vez lanzada la aplicación puedes abrir un navegador y probar la página de 
 ## Imagen docker
 
 ```
-https://hub.docker.com/r/amf162/mads-todolist
+https://hub.docker.com/r/nicoleepeiro/mads-todolist-equipo10
 ```
 
 ## Tablero Trello

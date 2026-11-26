@@ -55,7 +55,7 @@ public class TareaData implements Serializable {
     public void setPrioridad(String prioridad) {
         this.prioridad = prioridad;
     }
-    
+
     // Sobreescribimos equals y hashCode para que dos tareas sean iguales
     // si tienen el mismo ID (ignoramos el resto de atributos)
 

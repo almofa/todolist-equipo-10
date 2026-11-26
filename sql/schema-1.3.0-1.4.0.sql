@@ -1,0 +1,1 @@
+"ALTER TABLE public.tareas ADD COLUMN prioridad character varying(255) NOT NULL DEFAULT 'MEDIA';" | Out-File -FilePath sql/schema-1.3.0-1.4.0.sql -Encoding utf8

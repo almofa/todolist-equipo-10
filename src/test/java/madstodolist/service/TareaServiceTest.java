@@ -219,4 +219,31 @@ public class TareaServiceTest {
         assertThat(pendientes).isEqualTo(1);
         assertThat(completadas).isEqualTo(1);
     }
+
+    @Test
+    public void testCrearYModificarTareaConPrioridad() {
+        // GIVEN
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        Long tareaPorDefectoId = ids.get("tareaId");
+
+        // Una tarea creada sin especificar prioridad debe tener "MEDIA"
+        TareaData tareaPorDefecto = tareaService.findById(tareaPorDefectoId);
+        assertThat(tareaPorDefecto.getPrioridad()).isEqualTo("MEDIA");
+
+        // WHEN: creamos una tarea indicando prioridad "ALTA"
+        TareaData tareaAlta = tareaService.nuevaTareaUsuario(usuarioId, "Entregar memoria", "ALTA");
+
+        // THEN
+        assertThat(tareaAlta.getPrioridad()).isEqualTo("ALTA");
+        assertThat(tareaService.findById(tareaAlta.getId()).getPrioridad()).isEqualTo("ALTA");
+
+        // WHEN: modificamos título y prioridad a "BAJA"
+        TareaData tareaModificada = tareaService.modificaTarea(tareaAlta.getId(), "Entregar memoria final", "BAJA");
+
+        // THEN
+        assertThat(tareaModificada.getTitulo()).isEqualTo("Entregar memoria final");
+        assertThat(tareaModificada.getPrioridad()).isEqualTo("BAJA");
+        assertThat(tareaService.findById(tareaAlta.getId()).getPrioridad()).isEqualTo("BAJA");
+    }
 }

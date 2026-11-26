@@ -74,6 +74,38 @@ public class TareaService {
     }
 
     @Transactional(readOnly = true)
+    public List<TareaData> allTareasUsuarioPorEstadoYPrioridad(Long idUsuario, String estado, String prioridad) {
+        logger.debug("Devolviendo tareas del usuario " + idUsuario + " con estado=" + estado + " y prioridad=" + prioridad);
+        boolean sinFiltroPrioridad = (prioridad == null || prioridad.trim().isEmpty() || prioridad.equalsIgnoreCase("todas"));
+        if (sinFiltroPrioridad) {
+            return allTareasUsuarioPorEstado(idUsuario, estado);
+        }
+
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            throw new TareaServiceException("Usuario " + idUsuario + " no existe al listar tareas ");
+        }
+
+        String prioridadNorm = prioridad.trim().toUpperCase();
+        boolean sinFiltroEstado = (estado == null || estado.trim().isEmpty() || estado.equalsIgnoreCase("todas"));
+
+        List<Tarea> tareas;
+        if (sinFiltroEstado) {
+            tareas = tareaRepository.findByUsuarioIdAndPrioridadOrderByIdAsc(idUsuario, prioridadNorm);
+        } else if (estado.equalsIgnoreCase("completadas")) {
+            tareas = tareaRepository.findByUsuarioIdAndCompletadaAndPrioridadOrderByIdAsc(idUsuario, true, prioridadNorm);
+        } else if (estado.equalsIgnoreCase("pendientes")) {
+            tareas = tareaRepository.findByUsuarioIdAndCompletadaAndPrioridadOrderByIdAsc(idUsuario, false, prioridadNorm);
+        } else {
+            tareas = tareaRepository.findByUsuarioIdAndPrioridadOrderByIdAsc(idUsuario, prioridadNorm);
+        }
+
+        return tareas.stream()
+                .map(tarea -> modelMapper.map(tarea, TareaData.class))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public TareaData findById(Long tareaId) {
         logger.debug("Buscando tarea " + tareaId);
         Tarea tarea = tareaRepository.findById(tareaId).orElse(null);

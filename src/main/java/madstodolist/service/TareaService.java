@@ -42,6 +42,21 @@ public class TareaService {
         return modelMapper.map(tarea, TareaData.class);
     }
 
+    @Transactional
+    public TareaData nuevaTareaUsuario(Long idUsuario, String tituloTarea, String prioridad) {
+        logger.debug("Añadiendo tarea " + tituloTarea + " con prioridad " + prioridad + " al usuario " + idUsuario);
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            throw new TareaServiceException("Usuario " + idUsuario + " no existe al crear tarea " + tituloTarea);
+        }
+        Tarea tarea = new Tarea(usuario, tituloTarea);
+        if (prioridad != null && !prioridad.trim().isEmpty()) {
+            tarea.setPrioridad(prioridad.toUpperCase());
+        }
+        tareaRepository.save(tarea);
+        return modelMapper.map(tarea, TareaData.class);
+    }
+
     @Transactional(readOnly = true)
     public List<TareaData> allTareasUsuario(Long idUsuario) {
         logger.debug("Devolviendo todas las tareas del usuario " + idUsuario);
@@ -74,6 +89,21 @@ public class TareaService {
             throw new TareaServiceException("No existe tarea con id " + idTarea);
         }
         tarea.setTitulo(nuevoTitulo);
+        tarea = tareaRepository.save(tarea);
+        return modelMapper.map(tarea, TareaData.class);
+    }
+
+    @Transactional
+    public TareaData modificaTarea(Long idTarea, String nuevoTitulo, String nuevaPrioridad) {
+        logger.debug("Modificando tarea " + idTarea + " - " + nuevoTitulo + " - prioridad " + nuevaPrioridad);
+        Tarea tarea = tareaRepository.findById(idTarea).orElse(null);
+        if (tarea == null) {
+            throw new TareaServiceException("No existe tarea con id " + idTarea);
+        }
+        tarea.setTitulo(nuevoTitulo);
+        if (nuevaPrioridad != null && !nuevaPrioridad.trim().isEmpty()) {
+            tarea.setPrioridad(nuevaPrioridad.toUpperCase());
+        }
         tarea = tareaRepository.save(tarea);
         return modelMapper.map(tarea, TareaData.class);
     }
@@ -142,4 +172,6 @@ public class TareaService {
         }
         return tareaRepository.countByUsuarioIdAndCompletada(idUsuario, completada);
     }
+
+
 }

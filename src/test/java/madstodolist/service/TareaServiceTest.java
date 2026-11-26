@@ -282,4 +282,35 @@ public class TareaServiceTest {
         assertThatThrownBy(() -> tareaService.modificaTarea(999L, "Titulo", "ALTA"))
                 .isInstanceOf(TareaServiceException.class);
     }
+
+    @Test
+    public void testCrearTareaConPrioridadNoValidaLanzaExcepcion() {
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+
+        assertThatThrownBy(() -> tareaService.nuevaTareaUsuario(usuarioId, "Tarea rara", "URGENTE"))
+                .isInstanceOf(TareaServiceException.class);
+    }
+
+    @Test
+    public void testModificarTareaConPrioridadNoValidaLanzaExcepcion() {
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long tareaId = ids.get("tareaId");
+
+        assertThatThrownBy(() -> tareaService.modificaTarea(tareaId, "Nuevo titulo", "CRITICA"))
+                .isInstanceOf(TareaServiceException.class);
+    }
+
+    @Test
+    public void testPrioridadConEspaciosYMinusculasSeNormaliza() {
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+
+        TareaData tarea = tareaService.nuevaTareaUsuario(usuarioId, "Tarea con espacios", "  alta  ");
+        assertThat(tarea.getPrioridad()).isEqualTo("ALTA");
+
+        List<TareaData> filtradas = tareaService.allTareasUsuarioPorEstadoYPrioridad(usuarioId, " todas ", " alta ");
+        assertThat(filtradas).hasSize(1);
+        assertThat(filtradas.get(0).getId()).isEqualTo(tarea.getId());
+    }
 }

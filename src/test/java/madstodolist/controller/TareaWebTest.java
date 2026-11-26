@@ -294,4 +294,104 @@ public class TareaWebTest {
                         containsString("Pendientes (1)"),
                         containsString("Completadas (1)"))));
     }
+
+    @Test
+    public void crearYEditarTareaConPrioridadDesdeWeb() throws Exception {
+        // GIVEN
+        Long usuarioId = addUsuarioTareasBD().get("usuarioId");
+        when(managerUserSession.usuarioLogeado()).thenReturn(usuarioId);
+
+        // 1. El formulario de nueva tarea incluye el selector de prioridad
+        this.mockMvc.perform(get("/usuarios/" + usuarioId + "/tareas/nueva"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("name=\"prioridad\""),
+                        containsString("value=\"ALTA\""),
+                        containsString("value=\"MEDIA\""),
+                        containsString("value=\"BAJA\"")
+                )));
+
+        // 2. Al enviar POST con prioridad ALTA, se crea con prioridad ALTA
+        this.mockMvc.perform(post("/usuarios/" + usuarioId + "/tareas/nueva")
+                        .param("titulo", "Preparar demo")
+                        .param("prioridad", "ALTA"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/usuarios/" + usuarioId + "/tareas"));
+
+        TareaData tareaCreada = tareaService.allTareasUsuario(usuarioId).stream()
+                .filter(t -> "Preparar demo".equals(t.getTitulo()))
+                .findFirst()
+                .orElse(null);
+        assertThat(tareaCreada).isNotNull();
+        assertThat(tareaCreada.getPrioridad()).isEqualTo("ALTA");
+
+        // 3. El formulario de edición preselecciona la prioridad actual (ALTA)
+        this.mockMvc.perform(get("/tareas/" + tareaCreada.getId() + "/editar"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("value=\"ALTA\" selected=\"selected\"")));
+
+        // 4. Al editar y cambiar la prioridad a BAJA, se actualiza en BD
+        this.mockMvc.perform(post("/tareas/" + tareaCreada.getId() + "/editar")
+                        .param("titulo", "Preparar demo final")
+                        .param("prioridad", "BAJA"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/usuarios/" + usuarioId + "/tareas"));
+
+        TareaData tareaEditada = tareaService.findById(tareaCreada.getId());
+        assertThat(tareaEditada.getTitulo()).isEqualTo("Preparar demo final");
+        assertThat(tareaEditada.getPrioridad()).isEqualTo("BAJA");
+    }
+
+    @Test
+    public void filtrarTareasPorPrioridadYEstadoEnListadoWeb() throws Exception {
+        // GIVEN: "Lavar coche" (MEDIA, pendiente), "Renovar DNI" (MEDIA, pendiente),
+        // "Tarea urgente" (ALTA, pendiente) y "Tarea urgente hecha" (ALTA, completada)
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+
+        tareaService.nuevaTareaUsuario(usuarioId, "Tarea urgente", "ALTA");
+        TareaData altaHecha = tareaService.nuevaTareaUsuario(usuarioId, "Tarea urgente hecha", "ALTA");
+        tareaService.cambiarEstadoCompletada(altaHecha.getId());
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(usuarioId);
+        String urlBase = "/usuarios/" + usuarioId + "/tareas";
+
+        // WHEN & THEN: filtrar solo por prioridad=ALTA
+        this.mockMvc.perform(get(urlBase).param("prioridad", "ALTA"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Tarea urgente"),
+                        containsString("Tarea urgente hecha"),
+                        not(containsString("Lavar coche")),
+                        not(containsString("Renovar DNI"))
+                )));
+
+        // WHEN & THEN: combinar estado=pendientes y prioridad=ALTA
+        this.mockMvc.perform(get(urlBase)
+                        .param("estado", "pendientes")
+                        .param("prioridad", "ALTA"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("Tarea urgente"),
+                        not(containsString("Tarea urgente hecha")),
+                        not(containsString("Lavar coche"))
+                )));
+    }
+
+    @Test
+    public void cambiarEstadoMantieneFiltroDePrioridadActivo() throws Exception {
+        // GIVEN
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        TareaData tareaAlta = tareaService.nuevaTareaUsuario(usuarioId, "Revisar PR", "ALTA");
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(usuarioId);
+
+        // WHEN & THEN
+        this.mockMvc.perform(post("/tareas/" + tareaAlta.getId() + "/completar")
+                        .param("estado", "pendientes")
+                        .param("prioridad", "ALTA"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/usuarios/" + usuarioId + "/tareas?estado=pendientes&prioridad=ALTA"));
+    }
 }

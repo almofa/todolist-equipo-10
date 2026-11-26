@@ -246,4 +246,40 @@ public class TareaServiceTest {
         assertThat(tareaModificada.getPrioridad()).isEqualTo("BAJA");
         assertThat(tareaService.findById(tareaAlta.getId()).getPrioridad()).isEqualTo("BAJA");
     }
+
+    @Test
+    public void testFiltrarTareasPorEstadoYPrioridad() {
+        // GIVEN: usuario con tareas de distintas prioridades y estados
+        Map<String, Long> ids = addUsuarioTareasBD();
+        Long usuarioId = ids.get("usuarioId");
+        // addUsuarioTareasBD crea "Lavar coche" (MEDIA, pendiente) y "Renovar DNI" (MEDIA, pendiente)
+
+        TareaData altaPendiente = tareaService.nuevaTareaUsuario(usuarioId, "Examen MADS", "ALTA");
+        TareaData altaCompletada = tareaService.nuevaTareaUsuario(usuarioId, "Enviar practica", "ALTA");
+        tareaService.cambiarEstadoCompletada(altaCompletada.getId());
+
+        // WHEN
+        List<TareaData> todasAltas = tareaService.allTareasUsuarioPorEstadoYPrioridad(usuarioId, "todas", "ALTA");
+        List<TareaData> pendientesAltas = tareaService.allTareasUsuarioPorEstadoYPrioridad(usuarioId, "pendientes", "ALTA");
+        List<TareaData> completadasAltas = tareaService.allTareasUsuarioPorEstadoYPrioridad(usuarioId, "completadas", "ALTA");
+        List<TareaData> pendientesTodasPrioridades = tareaService.allTareasUsuarioPorEstadoYPrioridad(usuarioId, "pendientes", "TODAS");
+
+        // THEN
+        assertThat(todasAltas).hasSize(2);
+        assertThat(todasAltas).extracting(TareaData::getTitulo).containsExactly("Examen MADS", "Enviar practica");
+
+        assertThat(pendientesAltas).hasSize(1);
+        assertThat(pendientesAltas.get(0).getTitulo()).isEqualTo("Examen MADS");
+
+        assertThat(completadasAltas).hasSize(1);
+        assertThat(completadasAltas.get(0).getTitulo()).isEqualTo("Enviar practica");
+
+        assertThat(pendientesTodasPrioridades).hasSize(3);
+    }
+
+    @Test
+    public void testModificarTareaConPrioridadInexistenteLanzaExcepcion() {
+        assertThatThrownBy(() -> tareaService.modificaTarea(999L, "Titulo", "ALTA"))
+                .isInstanceOf(TareaServiceException.class);
+    }
 }

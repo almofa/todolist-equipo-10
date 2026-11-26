@@ -323,4 +323,37 @@ public class TareaTest {
         Tarea tareaActualizada = tareaRepository.findById(tarea.getId()).orElse(null);
         assertThat(tareaActualizada.getPrioridad()).isEqualTo("ALTA");
     }
+
+    @Test
+    @Transactional
+    public void buscarTareasPorUsuarioYPrioridad() {
+        // GIVEN
+        Usuario usuario = new Usuario("user@ua");
+        usuarioRepository.save(usuario);
+
+        Tarea tareaAlta = new Tarea(usuario, "Tarea urgente");
+        tareaAlta.setPrioridad("ALTA");
+
+        Tarea tareaMedia = new Tarea(usuario, "Tarea normal");
+        // Por defecto es MEDIA
+
+        Tarea tareaAltaCompletada = new Tarea(usuario, "Tarea urgente hecha");
+        tareaAltaCompletada.setPrioridad("ALTA");
+        tareaAltaCompletada.setCompletada(true);
+
+        tareaRepository.save(tareaAlta);
+        tareaRepository.save(tareaMedia);
+        tareaRepository.save(tareaAltaCompletada);
+
+        // WHEN
+        java.util.List<Tarea> altas = tareaRepository.findByUsuarioIdAndPrioridadOrderByIdAsc(usuario.getId(), "ALTA");
+        java.util.List<Tarea> altasPendientes = tareaRepository.findByUsuarioIdAndCompletadaAndPrioridadOrderByIdAsc(usuario.getId(), false, "ALTA");
+
+        // THEN
+        assertThat(altas).hasSize(2);
+        assertThat(altas).extracting(Tarea::getTitulo).containsExactly("Tarea urgente", "Tarea urgente hecha");
+
+        assertThat(altasPendientes).hasSize(1);
+        assertThat(altasPendientes.get(0).getTitulo()).isEqualTo("Tarea urgente");
+    }
 }

@@ -12,6 +12,7 @@ public class TareaData implements Serializable {
     private String titulo;
     private Long usuarioId;  // Esta es la ID del usuario asociado
     private boolean completada;
+    private String prioridad;
 
     // Getters y setters
 
@@ -45,6 +46,14 @@ public class TareaData implements Serializable {
 
     public void setCompletada(boolean completada) {
         this.completada = completada;
+    }
+
+    public String getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(String prioridad) {
+        this.prioridad = prioridad;
     }
 
     // Sobreescribimos equals y hashCode para que dos tareas sean iguales

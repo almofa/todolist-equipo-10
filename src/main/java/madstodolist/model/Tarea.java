@@ -17,6 +17,9 @@ public class Tarea implements Serializable {
     @NotNull
     private String titulo;
     private boolean completada = false;
+    @NotNull
+    @Column(nullable = false)
+    private String prioridad = "MEDIA";
 
     @NotNull
     // Relación muchos-a-uno entre tareas y usuario
@@ -60,6 +63,14 @@ public class Tarea implements Serializable {
 
     public void setCompletada(boolean completada) {
         this.completada = completada;
+    }
+
+    public String getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(String prioridad) {
+        this.prioridad = prioridad;
     }
 
     // Getters y setters de la relación muchos-a-uno con Usuario

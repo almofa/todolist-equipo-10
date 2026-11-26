@@ -42,6 +42,11 @@ public class TareaController {
         comprobarUsuarioLogeado(idUsuario);
 
         UsuarioData usuario = usuarioService.findById(idUsuario);
+
+        if (tareaData.getPrioridad() == null) {
+            tareaData.setPrioridad("MEDIA");
+        }
+
         model.addAttribute("usuario", usuario);
         return "formNuevaTarea";
     }
@@ -53,23 +58,23 @@ public class TareaController {
 
         comprobarUsuarioLogeado(idUsuario);
 
-        tareaService.nuevaTareaUsuario(idUsuario, tareaData.getTitulo());
-        flash.addFlashAttribute("mensaje", "Tarea creada correctamente");
+        tareaService.nuevaTareaUsuario(idUsuario, tareaData.getTitulo(), tareaData.getPrioridad());        flash.addFlashAttribute("mensaje", "Tarea creada correctamente");
         return "redirect:/usuarios/" + idUsuario + "/tareas";
      }
 
     @GetMapping("/usuarios/{id}/tareas")
     public String listadoTareas(@PathVariable(value="id") Long idUsuario,
                                 @RequestParam(value="estado", required=false, defaultValue="todas") String estado,
+                                @RequestParam(value="prioridad", required=false, defaultValue="TODAS") String prioridad,
                                 Model model, HttpSession session) {
 
         comprobarUsuarioLogeado(idUsuario);
 
         UsuarioData usuario = usuarioService.findById(idUsuario);
-        List<TareaData> tareas = tareaService.allTareasUsuarioPorEstado(idUsuario, estado);
-        model.addAttribute("usuario", usuario);
+        List<TareaData> tareas = tareaService.allTareasUsuarioPorEstadoYPrioridad(idUsuario, estado, prioridad);        model.addAttribute("usuario", usuario);
         model.addAttribute("tareas", tareas);
         model.addAttribute("estadoSeleccionado", estado);
+        model.addAttribute("prioridadSeleccionada", prioridad);
         // Contadores para mostrar en las pestañas de filtrado
         long numPendientes = tareaService.contarTareasPorEstado(idUsuario, false);
         long numCompletadas = tareaService.contarTareasPorEstado(idUsuario, true);
@@ -92,6 +97,7 @@ public class TareaController {
 
         model.addAttribute("tarea", tarea);
         tareaData.setTitulo(tarea.getTitulo());
+        tareaData.setPrioridad(tarea.getPrioridad());
         return "formEditarTarea";
     }
 
@@ -107,7 +113,7 @@ public class TareaController {
 
         comprobarUsuarioLogeado(idUsuario);
 
-        tareaService.modificaTarea(idTarea, tareaData.getTitulo());
+        tareaService.modificaTarea(idTarea, tareaData.getTitulo(), tareaData.getPrioridad());
         flash.addFlashAttribute("mensaje", "Tarea modificada correctamente");
         return "redirect:/usuarios/" + tarea.getUsuarioId() + "/tareas";
     }
@@ -131,6 +137,7 @@ public class TareaController {
     @PostMapping("/tareas/{id}/completar")
     public String cambiarEstadoTarea(@PathVariable(value="id") Long idTarea,
                                      @RequestParam(value="estado", required=false, defaultValue="todas") String estado,
+                                     @RequestParam(value="prioridad", required=false, defaultValue="TODAS") String prioridad,
                                      RedirectAttributes flash, HttpSession session) {
         TareaData tarea = tareaService.findById(idTarea);
         if (tarea == null) {
@@ -142,7 +149,12 @@ public class TareaController {
 
         tareaService.cambiarEstadoCompletada(idTarea);
         flash.addFlashAttribute("mensaje", "Estado de la tarea actualizado");
-        return "redirect:/usuarios/" + idUsuario + "/tareas?estado=" + estado;
+
+        String redirectUrl = "/usuarios/" + idUsuario + "/tareas?estado=" + estado;
+        if (prioridad != null && !prioridad.equalsIgnoreCase("TODAS")) {
+            redirectUrl += "&prioridad=" + prioridad;
+        }
+        return "redirect:" + redirectUrl;
     }
 }
 

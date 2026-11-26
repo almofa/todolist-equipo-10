@@ -298,4 +298,29 @@ public class TareaTest {
         assertThat(completadas).hasSize(1);
         assertThat(completadas.get(0).getTitulo()).isEqualTo("Tarea completada");
     }
+
+    @Test
+    @Transactional
+    public void tareaNuevaTienePrioridadMediaPorDefectoYSePuedeModificar() {
+        // GIVEN
+        Usuario usuario = new Usuario("user@ua");
+        usuarioRepository.save(usuario);
+        Tarea tarea = new Tarea(usuario, "Práctica 5 de MADS");
+
+        // WHEN
+        tareaRepository.save(tarea);
+        Tarea tareaBD = tareaRepository.findById(tarea.getId()).orElse(null);
+
+        // THEN
+        assertThat(tareaBD).isNotNull();
+        assertThat(tareaBD.getPrioridad()).isEqualTo("MEDIA");
+
+        // WHEN
+        tareaBD.setPrioridad("ALTA");
+        tareaRepository.save(tareaBD);
+
+        // THEN
+        Tarea tareaActualizada = tareaRepository.findById(tarea.getId()).orElse(null);
+        assertThat(tareaActualizada.getPrioridad()).isEqualTo("ALTA");
+    }
 }

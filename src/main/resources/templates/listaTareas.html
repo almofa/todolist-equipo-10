@@ -15,32 +15,46 @@
 
     <div class="row mt-3">
         <div class="col">
-            <ul class="nav nav-pills mb-3">
-                <li class="nav-item">
-                    <a class="nav-link"
-                       th:classappend="${estadoSeleccionado == null or estadoSeleccionado == 'todas'} ? 'active'"
-                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='todas')}"
-                       th:text="'Todas (' + ${numTodas} + ')'">Todas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       th:classappend="${estadoSeleccionado == 'pendientes'} ? 'active'"
-                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='pendientes')}"
-                       th:text="'Pendientes (' + ${numPendientes} + ')'">Pendientes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       th:classappend="${estadoSeleccionado == 'completadas'} ? 'active'"
-                       th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='completadas')}"
-                       th:text="'Completadas (' + ${numCompletadas} + ')'">Completadas</a>
-                </li>
-            </ul>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <ul class="nav nav-pills mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${estadoSeleccionado == null or estadoSeleccionado == 'todas'} ? 'active'"
+                           th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='todas', prioridad=${prioridadSeleccionada})}"
+                           th:text="'Todas (' + ${numTodas} + ')'">Todas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${estadoSeleccionado == 'pendientes'} ? 'active'"
+                           th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='pendientes', prioridad=${prioridadSeleccionada})}"
+                           th:text="'Pendientes (' + ${numPendientes} + ')'">Pendientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${estadoSeleccionado == 'completadas'} ? 'active'"
+                           th:href="@{/usuarios/{id}/tareas(id=${usuario.id}, estado='completadas', prioridad=${prioridadSeleccionada})}"
+                           th:text="'Completadas (' + ${numCompletadas} + ')'">Completadas</a>
+                    </li>
+                </ul>
+
+                <form class="form-inline" method="get" th:action="@{/usuarios/{id}/tareas(id=${usuario.id})}">
+                    <input type="hidden" name="estado" th:value="${estadoSeleccionado}" />
+                    <label class="mr-2 font-weight-bold" for="filtroPrioridad">Prioridad:</label>
+                    <select class="form-control form-control-sm" id="filtroPrioridad" name="prioridad" onchange="this.form.submit()">
+                        <option value="TODAS" th:selected="${prioridadSeleccionada == null or prioridadSeleccionada == 'TODAS'}">Todas</option>
+                        <option value="ALTA" th:selected="${prioridadSeleccionada == 'ALTA'}">Alta</option>
+                        <option value="MEDIA" th:selected="${prioridadSeleccionada == 'MEDIA'}">Media</option>
+                        <option value="BAJA" th:selected="${prioridadSeleccionada == 'BAJA'}">Baja</option>
+                    </select>
+                </form>
+            </div>
 
             <table class="table table-striped">
                 <thead>
                 <tr>
                     <th>Id</th>
                     <th>Tarea</th>
+                    <th>Prioridad</th>
                     <th>Estado</th>
                     <th>Acción</th>
                 </tr>
@@ -53,12 +67,18 @@
                               th:style="${tarea.completada} ? 'text-decoration: line-through; color: #6c757d;' : ''"></span>
                     </td>
                     <td>
+                        <span th:if="${tarea.prioridad == 'ALTA'}" class="badge badge-danger">Alta</span>
+                        <span th:if="${tarea.prioridad == 'MEDIA' or tarea.prioridad == null}" class="badge badge-warning">Media</span>
+                        <span th:if="${tarea.prioridad == 'BAJA'}" class="badge badge-info">Baja</span>
+                    </td>
+                    <td>
                         <span th:if="${tarea.completada}" class="badge badge-success">Completada</span>
-                        <span th:unless="${tarea.completada}" class="badge badge-warning">Pendiente</span>
+                        <span th:unless="${tarea.completada}" class="badge badge-secondary">Pendiente</span>
                     </td>
                     <td>
                         <form th:action="@{/tareas/{id}/completar(id=${tarea.id})}" method="post" style="display:inline;">
                             <input type="hidden" name="estado" th:value="${estadoSeleccionado}" />
+                            <input type="hidden" name="prioridad" th:value="${prioridadSeleccionada}" />
                             <button type="submit"
                                     th:class="${tarea.completada} ? 'btn btn-secondary btn-xs' : 'btn btn-success btn-xs'"
                                     th:text="${tarea.completada} ? 'Reabrir' : 'Completar'"></button>
